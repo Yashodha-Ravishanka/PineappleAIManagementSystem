@@ -1,0 +1,125 @@
+.ai-status {
+
+  margin-top: 30px;
+
+  padding: 30px;
+
+  border-radius: 22px;
+
+  color: white;
+
+  background: rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,0.15);
+
+  transition: 0.3s;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+
+}
+
+
+.ai-status:hover {
+
+  transform: translateY(-5px);
+
+}
+
+
+
+/* Title */
+
+.ai-status h2 {
+
+  color: #facc15;
+
+  font-size: 24px;
+
+  margin-bottom: 20px;
+
+}
+
+
+
+/* Text */
+
+.ai-status p {
+
+  font-size: 19px;
+
+  margin: 12px 0;
+
+}
+
+
+.ai-status strong {
+
+  margin-left: 8px;
+
+  font-size: 21px;
+
+}
+
+
+
+/* Healthy AI prediction */
+
+.ai-status.low {
+
+  border-left: 8px solid #22c55e;
+
+  background:
+  rgba(34,197,94,0.15);
+
+}
+
+
+
+/* Warning */
+
+.ai-status.medium {
+
+  border-left: 8px solid #eab308;
+
+  background:
+  rgba(234,179,8,0.15);
+
+}
+
+
+
+/* High risk */
+
+.ai-status.high {
+
+  border-left: 8px solid #ef4444;
+
+  background:
+  rgba(239,68,68,0.15);
+
+}
+
+
+
+/* No data */
+
+.ai-status.unknown {
+
+  border-left: 8px solid #94a3b8;
+
+  background:
+  rgba(148,163,184,0.15);
+
+}
+
+
+
+/* AI badge effect */
+
+.ai-status h2::before {
+
+  content:"🤖 ";
+
+}

@@ -1,0 +1,99 @@
+.ai-prediction {
+
+  background: rgba(255,255,255,0.08);
+
+  padding: 25px;
+
+  border-radius: 20px;
+
+  margin: 30px auto;
+
+  max-width: 600px;
+
+  color: white;
+
+}
+
+
+
+.ai-prediction h2 {
+
+  text-align: center;
+
+  color: #facc15;
+
+  margin-bottom: 20px;
+
+}
+
+
+
+.ai-prediction input {
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin: 8px 0;
+
+  border-radius: 10px;
+
+  border: none;
+
+  font-size: 16px;
+
+}
+
+
+
+.ai-prediction button {
+
+  width: 100%;
+
+  padding: 12px;
+
+  margin-top: 15px;
+
+  background: #16a34a;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+}
+
+
+
+.ai-prediction button:hover {
+
+  background: #15803d;
+
+}
+
+
+
+.prediction-result {
+
+  margin-top: 25px;
+
+  padding: 20px;
+
+  background: rgba(0,0,0,0.3);
+
+  border-radius: 15px;
+
+}
+
+
+
+.prediction-result h3 {
+
+  color: #facc15;
+
+}

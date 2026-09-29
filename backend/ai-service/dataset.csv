@@ -1,0 +1,13 @@
+temperature,humidity,storage_days,quality
+25,80,2,Good
+26,82,3,Good
+28,85,4,Good
+30,85,5,Average
+31,88,6,Average
+33,90,7,Bad
+35,95,8,Bad
+36,96,10,Bad
+40,90,12,Bad
+24,75,1,Good
+29,83,4,Average
+34,92,9,Bad

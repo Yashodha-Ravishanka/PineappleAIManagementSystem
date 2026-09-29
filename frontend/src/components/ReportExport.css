@@ -1,0 +1,97 @@
+.report-container {
+
+  margin: 35px auto;
+
+  padding: 25px;
+
+  max-width: 500px;
+
+  text-align: center;
+
+  background:
+  rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  border-radius: 22px;
+
+  border:
+  1px solid rgba(255,255,255,0.15);
+
+  box-shadow:
+  0 10px 30px rgba(0,0,0,0.25);
+
+}
+
+
+.report-container h2 {
+
+  color: #facc15;
+
+  margin-bottom: 20px;
+
+  font-size: 24px;
+
+}
+
+
+
+.report-container button {
+
+  padding: 13px 28px;
+
+  margin: 10px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  color: white;
+
+  font-size: 16px;
+
+  transition: 0.3s;
+
+}
+
+
+
+.pdf-btn {
+
+  background: #dc2626;
+
+}
+
+
+
+.excel-btn {
+
+  background: #16a34a;
+
+}
+
+
+
+.report-container button:hover {
+
+  transform: translateY(-4px);
+
+  opacity:0.9;
+
+}
+
+
+
+@media(max-width:600px){
+
+  .report-container button{
+
+    width:90%;
+
+    margin:8px;
+
+  }
+
+}

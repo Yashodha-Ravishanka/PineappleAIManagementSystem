@@ -1,0 +1,150 @@
+.notification {
+
+  position: fixed;
+
+  top: 25px;
+
+  right: 25px;
+
+  width: 340px;
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  color:white;
+
+  z-index:1000;
+
+  backdrop-filter:blur(12px);
+
+  box-shadow:
+  0 10px 30px rgba(0,0,0,0.3);
+
+  animation:slideIn 0.5s ease;
+
+}
+
+
+
+.notification h3 {
+
+  margin:0 0 10px 0;
+
+  font-size:20px;
+
+}
+
+
+
+.notification p {
+
+  margin:0;
+
+  font-size:16px;
+
+}
+
+
+
+
+
+/* High Risk */
+
+.notification.high {
+
+  background:rgba(239,68,68,0.92);
+
+  border-left:8px solid #991b1b;
+
+}
+
+
+
+
+
+/* Medium Risk */
+
+.notification.medium {
+
+  background:rgba(234,179,8,0.92);
+
+  border-left:8px solid #854d0e;
+
+}
+
+
+
+
+
+/* Low Risk / Good Batch */
+
+.notification.low {
+
+  background:rgba(34,197,94,0.92);
+
+  border-left:8px solid #166534;
+
+}
+
+
+
+
+
+
+.close-btn {
+
+  position:absolute;
+
+  top:10px;
+
+  right:12px;
+
+  border:none;
+
+  background:transparent;
+
+  color:white;
+
+  font-size:20px;
+
+  cursor:pointer;
+
+}
+
+
+
+.close-btn:hover {
+
+  transform:scale(1.2);
+
+}
+
+
+
+
+
+
+@keyframes slideIn {
+
+
+from {
+
+transform:translateX(400px);
+
+opacity:0;
+
+}
+
+
+
+to {
+
+transform:translateX(0);
+
+opacity:1;
+
+}
+
+
+}

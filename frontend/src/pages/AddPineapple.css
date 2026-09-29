@@ -1,0 +1,151 @@
+.add-container {
+
+    width: 500px;
+
+    max-width: 90%;
+
+    margin: 50px auto;
+
+    padding: 35px;
+
+
+    background:
+    rgba(255,255,255,0.08);
+
+
+    backdrop-filter: blur(12px);
+
+
+    border-radius: 25px;
+
+
+    border:
+    1px solid rgba(255,255,255,0.15);
+
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.3);
+
+
+    color:white;
+
+}
+
+
+
+.add-container h1 {
+
+    text-align:center;
+
+    color:#facc15;
+
+    margin-bottom:30px;
+
+    font-size:30px;
+
+}
+
+
+
+/* Inputs */
+
+.add-container input {
+
+    width:100%;
+
+    padding:14px;
+
+    margin:12px 0;
+
+
+    border:none;
+
+    border-radius:12px;
+
+
+    outline:none;
+
+
+    font-size:16px;
+
+}
+
+
+
+/* Input focus */
+
+.add-container input:focus {
+
+    box-shadow:
+    0 0 10px rgba(250,204,21,0.5);
+
+}
+
+
+
+/* Button */
+
+.add-container button {
+
+
+    width:100%;
+
+
+    padding:15px;
+
+
+    margin-top:20px;
+
+
+    background:#166534;
+
+
+    color:white;
+
+
+    border:none;
+
+
+    border-radius:12px;
+
+
+    font-size:17px;
+
+
+    font-weight:bold;
+
+
+    cursor:pointer;
+
+
+    transition:0.3s;
+
+}
+
+
+
+.add-container button:hover {
+
+
+    background:#22c55e;
+
+
+    transform:translateY(-3px);
+
+}
+
+
+
+/* Mobile */
+
+@media(max-width:600px){
+
+
+    .add-container{
+
+        padding:25px;
+
+    }
+
+
+}

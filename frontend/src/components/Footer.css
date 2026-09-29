@@ -1,0 +1,44 @@
+.footer {
+
+  padding:30px;
+
+  text-align:center;
+
+  background:
+  rgba(5,46,22,0.9);
+
+  color:white;
+
+  border-top:
+  1px solid rgba(255,255,255,0.15);
+
+}
+
+
+.footer h3 {
+
+  color:#facc15;
+
+  margin-bottom:10px;
+
+}
+
+
+.footer p {
+
+  color:#e2e8f0;
+
+  margin:8px;
+
+}
+
+
+.footer .copyright {
+
+  margin-top:15px;
+
+  font-size:14px;
+
+  opacity:0.8;
+
+}

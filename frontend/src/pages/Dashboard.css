@@ -1,0 +1,163 @@
+.dashboard-container {
+
+  min-height: 100vh;
+
+  padding: 40px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #052e16,
+    #0f172a
+  );
+
+  color: white;
+
+}
+
+
+/* Main title */
+
+.dashboard-container h1 {
+
+  text-align: center;
+
+  color: #facc15;
+
+  font-size: 36px;
+
+  margin-bottom: 35px;
+
+  letter-spacing: 1px;
+
+}
+
+
+
+/* Status cards area */
+
+.status-container {
+
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 25px;
+
+  margin-bottom: 40px;
+
+}
+
+
+
+/* Dashboard sections */
+
+.dashboard-container > div:not(.status-container) {
+
+  margin-bottom: 30px;
+
+}
+
+
+
+/* Responsive laptop/tablet */
+
+@media(max-width:1200px){
+
+  .status-container{
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+  }
+
+}
+
+
+
+/* Mobile */
+
+@media(max-width:700px){
+
+  .dashboard-container{
+
+    padding:20px;
+
+  }
+
+
+  .dashboard-container h1{
+
+    font-size:28px;
+
+  }
+
+
+  .status-container{
+
+    grid-template-columns:
+    repeat(1,1fr);
+
+  }
+
+}
+
+.environment-card{
+
+margin-top:25px;
+
+margin-bottom:35px;
+
+padding:25px;
+
+background:rgba(255,255,255,0.08);
+
+backdrop-filter:blur(12px);
+
+border-radius:20px;
+
+border:1px solid rgba(255,255,255,0.15);
+
+box-shadow:0 10px 25px rgba(0,0,0,0.25);
+
+color:white;
+
+transition:0.3s;
+
+}
+
+.environment-card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:0 18px 35px rgba(0,0,0,0.35);
+
+}
+
+.environment-card h2{
+
+color:#facc15;
+
+margin-bottom:18px;
+
+font-size:28px;
+
+}
+
+.environment-card p{
+
+font-size:18px;
+
+margin:10px 0;
+
+}
+
+.environment-card h3{
+
+margin-top:20px;
+
+font-size:30px;
+
+font-weight:bold;
+
+}

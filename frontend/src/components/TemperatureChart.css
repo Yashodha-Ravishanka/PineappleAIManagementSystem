@@ -1,0 +1,24 @@
+.temperature-chart{
+
+background:rgba(255,255,255,0.08);
+
+padding:25px;
+
+margin:20px;
+
+border-radius:20px;
+
+backdrop-filter:blur(10px);
+
+}
+
+
+.temperature-chart h2{
+
+color:white;
+
+text-align:center;
+
+margin-bottom:20px;
+
+}

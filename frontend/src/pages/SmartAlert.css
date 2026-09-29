@@ -1,0 +1,545 @@
+
+.smart-alert-page {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px;
+  box-sizing: border-box;
+  color: white;
+}
+
+.smart-alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.smart-alert-header h1 {
+  margin: 0;
+  color: #facc15;
+  font-size: 32px;
+}
+
+.smart-alert-header p {
+  margin: 8px 0 0;
+  color: #94a3b8;
+}
+
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+
+/* =========================
+   SUMMARY
+========================= */
+
+.alert-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 35px;
+}
+
+.summary-card {
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-card span {
+  display: block;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.summary-card strong {
+  font-size: 28px;
+  color: white;
+}
+
+.high-card {
+  border-left: 5px solid #ef4444;
+}
+
+.medium-card {
+  border-left: 5px solid #f59e0b;
+}
+
+.low-card {
+  border-left: 5px solid #22c55e;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+
+.alerts-section {
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.section-header span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+
+/* =========================
+   SEARCH + FILTER CONTROLS
+========================= */
+
+.alert-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 15px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.alert-search {
+  flex: 1;
+  min-width: 220px;
+  padding: 12px 15px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+
+  outline: none;
+  font-size: 13px;
+}
+
+.alert-search::placeholder {
+  color: #64748b;
+}
+
+.alert-search:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.08);
+}
+
+
+/* FILTER BUTTONS */
+
+.alert-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: rgba(250, 204, 21, 0.12);
+  border-color: #facc15;
+  color: #facc15;
+}
+
+
+/* HIGH FILTER */
+
+.filter-btn.high-filter.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+
+/* MEDIUM FILTER */
+
+.filter-btn.medium-filter.active {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+
+/* LOW FILTER */
+
+.filter-btn.low-filter.active {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+
+/* RESULT COUNT */
+
+.alert-result-count {
+  margin-bottom: 18px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.alert-result-count strong {
+  color: #cbd5e1;
+}
+
+
+/* =========================
+   ALERT LIST
+========================= */
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* =========================
+   ALERT CARD
+========================= */
+
+.smart-alert-card {
+  width: 100%;
+  padding: 22px;
+  box-sizing: border-box;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* HIGH */
+
+.smart-alert-card.high {
+  border-left: 6px solid #ef4444;
+}
+
+.smart-alert-card.high .alert-type {
+  color: #ef4444;
+}
+
+
+/* MEDIUM */
+
+.smart-alert-card.medium {
+  border-left: 6px solid #f59e0b;
+}
+
+.smart-alert-card.medium .alert-type {
+  color: #f59e0b;
+}
+
+
+/* LOW */
+
+.smart-alert-card.low {
+  border-left: 6px solid #22c55e;
+}
+
+.smart-alert-card.low .alert-type {
+  color: #22c55e;
+}
+
+
+/* =========================
+   CARD HEADER
+========================= */
+
+.alert-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.alert-type {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.alert-card-header h3 {
+  margin: 6px 0 0;
+  font-size: 20px;
+}
+
+.active-badge {
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.alert-message {
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+
+/* =========================
+   SENSOR GRID
+========================= */
+
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.sensor-item {
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.sensor-item span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.sensor-item strong {
+  color: white;
+  font-size: 16px;
+}
+
+
+/* =========================
+   RECOMMENDATION
+========================= */
+
+.recommendation {
+  padding: 15px;
+  margin-bottom: 18px;
+
+  border-radius: 10px;
+
+  background: rgba(250, 204, 21, 0.06);
+  border: 1px solid rgba(250, 204, 21, 0.15);
+}
+
+.recommendation strong {
+  color: #facc15;
+  font-size: 12px;
+}
+
+.recommendation p {
+  margin: 8px 0 0;
+
+  color: #cbd5e1;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================
+   INFO
+========================= */
+
+.alert-info {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+.alert-info p {
+  margin: 5px 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty-alert {
+  padding: 60px 20px;
+
+  text-align: center;
+
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-alert h3 {
+  margin: 15px 0 5px;
+}
+
+.empty-alert p {
+  color: #94a3b8;
+}
+
+.empty-icon {
+  width: 55px;
+  height: 55px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(34, 197, 94, 0.15);
+
+  color: #22c55e;
+
+  font-size: 28px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+  .alert-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .alert-search {
+    width: 100%;
+  }
+
+  .alert-filters {
+    justify-content: flex-start;
+  }
+
+}
+
+
+@media (max-width: 900px) {
+
+  .alert-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .smart-alert-page {
+    padding: 20px;
+  }
+
+  .smart-alert-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .smart-alert-header h1 {
+    font-size: 26px;
+  }
+
+  .alert-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .alert-controls {
+    padding: 12px;
+  }
+
+  .alert-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
+  .sensor-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
