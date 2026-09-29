@@ -1,4 +1,6 @@
-const API_URL = "http://192.168.1.3:5000/api/pineapple";
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://pineapple-ai-backend.de.deplexo.com/api/pineapple";
 
 
 export async function getAllPineapples() {
@@ -38,50 +40,48 @@ export async function addPineapple(data) {
 
 }
 
+
 export async function updatePineapple(id, data) {
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "PUT",
+    const response = await fetch(
+        `${API_URL}/${id}`,
+        {
+            method: "PUT",
 
-      headers:{
-        "Content-Type":"application/json",
-      },
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-      body: JSON.stringify(data),
+            body: JSON.stringify(data),
+        }
+    );
+
+
+    if (!response.ok) {
+        throw new Error("Failed to update pineapple");
     }
-  );
 
 
-  if(!response.ok){
-
-    throw new Error("Failed to update pineapple");
-
-  }
-
-
-  return response.json();
+    return response.json();
 
 }
 
-export async function deletePineapple(id){
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method:"DELETE"
+export async function deletePineapple(id) {
+
+    const response = await fetch(
+        `${API_URL}/${id}`,
+        {
+            method: "DELETE"
+        }
+    );
+
+
+    if (!response.ok) {
+        throw new Error("Failed to delete pineapple");
     }
-  );
 
 
-  if(!response.ok){
-
-    throw new Error("Failed to delete pineapple");
-
-  }
-
-
-  return response.json();
+    return response.json();
 
 }
