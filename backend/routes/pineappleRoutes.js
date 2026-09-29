@@ -39,33 +39,72 @@ router.get("/all", async (req, res) => {
 
 
 // ===============================
-// ADD PINEAPPLE + AI PREDICTION
+// ADD PINEAPPLE BATCH
 // ===============================
+// Used for adding a new pineapple batch.
+// This route creates a new document.
 
 router.post("/add", async (req, res) => {
 
-    console.log(
-        "ADD ROUTE HIT"
-    );
+    console.log("ADD ROUTE HIT");
 
     try {
 
-        // Send only AI-supported values
-        const aiResponse = await axios.post(
+        const temperature =
+            Number(req.body.temperature);
 
-            AI_URL,
+        const humidity =
+            Number(req.body.humidity);
 
-            {
-                temperature: Number(req.body.temperature),
+        const warehouseId =
+            req.body.warehouseId || "WH-001";
 
-                humidity: Number(req.body.humidity),
+        const location =
+            req.body.location || "Gampaha";
 
-                storage_days: Number(
-                    req.body.storage_days || 0
-                )
-            }
 
+        console.log(
+            "WAREHOUSE:",
+            warehouseId
         );
+
+        console.log(
+            "TEMPERATURE:",
+            temperature
+        );
+
+        console.log(
+            "HUMIDITY:",
+            humidity
+        );
+
+        console.log(
+            "LOCATION:",
+            location
+        );
+
+
+        // =====================================
+        // AI PREDICTION
+        // =====================================
+
+        const aiResponse =
+            await axios.post(
+
+                AI_URL,
+
+                {
+                    temperature: temperature,
+
+                    humidity: humidity,
+
+                    storage_days:
+                        Number(
+                            req.body.storage_days || 0
+                        )
+                }
+
+            );
 
 
         console.log(
@@ -74,29 +113,75 @@ router.post("/add", async (req, res) => {
         );
 
 
-        // Save sensor + AI data
-        // timestamp is automatically added by MongoDB
+        // =====================================
+        // UPDATE EXISTING WAREHOUSE BATCHES
+        // =====================================
+
+        const environmentUpdate =
+            await Pineapple.updateMany(
+
+                {
+                    warehouseId:
+                        warehouseId
+                },
+
+                {
+                    $set: {
+
+                        temperature:
+                            temperature,
+
+                        humidity:
+                            humidity
+
+                    }
+                }
+
+            );
+
+
+        console.log(
+            "WAREHOUSE BATCHES MATCHED:",
+            environmentUpdate.matchedCount
+        );
+
+        console.log(
+            "WAREHOUSE BATCHES UPDATED:",
+            environmentUpdate.modifiedCount
+        );
+
+
+        // =====================================
+        // SAVE NEW PINEAPPLE BATCH
+        // =====================================
+
         const pineappleData = {
 
-            batchId: req.body.batchId,
+            batchId:
+                req.body.batchId ||
+                "MANUAL-BATCH",
 
-            temperature: Number(
-                req.body.temperature
-            ),
+            warehouseId:
+                warehouseId,
 
-            humidity: Number(
-                req.body.humidity
-            ),
+            temperature:
+                temperature,
 
-            mq135: Number(
-                req.body.mq135 || 0
-            ),
+            humidity:
+                humidity,
 
-            storage_days: Number(
-                req.body.storage_days || 0
-            ),
+            mq135:
+                Number(
+                    req.body.mq135 || 0
+                ),
 
-            location: req.body.location,
+            storage_days:
+                Number(
+                    req.body.storage_days || 0
+                ),
+
+            location:
+                location,
 
             quality:
                 aiResponse.data.quality ||
@@ -114,7 +199,7 @@ router.post("/add", async (req, res) => {
 
 
         console.log(
-            "FINAL OBJECT:",
+            "FINAL PINEAPPLE OBJECT:",
             pineappleData
         );
 
@@ -129,7 +214,36 @@ router.post("/add", async (req, res) => {
             await pineapple.save();
 
 
-        res.json(saved);
+        console.log(
+            "SAVED TO MONGODB ATLAS:",
+            saved
+        );
+
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Pineapple batch added successfully",
+
+            savedReading:
+                saved,
+
+            environmentUpdate: {
+
+                warehouseId:
+                    warehouseId,
+
+                matchedBatches:
+                    environmentUpdate.matchedCount,
+
+                updatedBatches:
+                    environmentUpdate.modifiedCount
+
+            }
+
+        });
 
     }
 
@@ -141,7 +255,183 @@ router.post("/add", async (req, res) => {
         );
 
         res.status(500).json({
-            message: error.message
+
+            success: false,
+
+            message:
+                error.message
+
+        });
+
+    }
+
+});
+
+
+// ===============================
+// UPDATE WAREHOUSE ENVIRONMENT
+// ===============================
+// Used by ESP32.
+// DOES NOT create a new document.
+// Updates all batches belonging to
+// the specified warehouse.
+
+router.post("/environment", async (req, res) => {
+
+    console.log(
+        "ENVIRONMENT ROUTE HIT"
+    );
+
+    try {
+
+        const temperature =
+            Number(
+                req.body.temperature
+            );
+
+        const humidity =
+            Number(
+                req.body.humidity
+            );
+
+        const mq135 =
+            Number(
+                req.body.mq135 || 0
+            );
+
+        const warehouseId =
+            req.body.warehouseId ||
+            "WH-001";
+
+        const location =
+            req.body.location ||
+            "Gampaha";
+
+
+        console.log(
+            "WAREHOUSE:",
+            warehouseId
+        );
+
+        console.log(
+            "TEMPERATURE:",
+            temperature
+        );
+
+        console.log(
+            "HUMIDITY:",
+            humidity
+        );
+
+        console.log(
+            "MQ135:",
+            mq135
+        );
+
+        console.log(
+            "LOCATION:",
+            location
+        );
+
+
+        // =====================================
+        // UPDATE ALL BATCHES IN WAREHOUSE
+        // =====================================
+
+        const environmentUpdate =
+            await Pineapple.updateMany(
+
+                {
+                    warehouseId:
+                        warehouseId
+                },
+
+                {
+                    $set: {
+
+                        temperature:
+                            temperature,
+
+                        humidity:
+                            humidity,
+
+                        mq135:
+                            mq135,
+
+                        location:
+                            location,
+
+                        timestamp:
+                            new Date()
+
+                    }
+
+                }
+
+            );
+
+
+        console.log(
+            "WAREHOUSE BATCHES MATCHED:",
+            environmentUpdate.matchedCount
+        );
+
+        console.log(
+            "WAREHOUSE BATCHES UPDATED:",
+            environmentUpdate.modifiedCount
+        );
+
+
+        // =====================================
+        // RESPONSE
+        // =====================================
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Warehouse environment updated",
+
+            warehouseId:
+                warehouseId,
+
+            temperature:
+                temperature,
+
+            humidity:
+                humidity,
+
+            mq135:
+                mq135,
+
+            location:
+                location,
+
+            matchedBatches:
+                environmentUpdate.matchedCount,
+
+            updatedBatches:
+                environmentUpdate.modifiedCount
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "ENVIRONMENT UPDATE ERROR:",
+            error.message
+        );
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                error.message
+
         });
 
     }
@@ -167,25 +457,32 @@ router.put("/:id", async (req, res) => {
         );
 
 
-        const aiResponse = await axios.post(
+        const aiResponse =
+            await axios.post(
 
-            AI_URL,
+                AI_URL,
 
-            {
-                temperature: Number(
-                    req.body.temperature
-                ),
+                {
 
-                humidity: Number(
-                    req.body.humidity
-                ),
+                    temperature:
+                        Number(
+                            req.body.temperature
+                        ),
 
-                storage_days: Number(
-                    req.body.storage_days || 0
-                )
-            }
+                    humidity:
+                        Number(
+                            req.body.humidity
+                        ),
 
-        );
+                    storage_days:
+                        Number(
+                            req.body.storage_days ||
+                            0
+                        )
+
+                }
+
+            );
 
 
         console.log(
@@ -196,23 +493,28 @@ router.put("/:id", async (req, res) => {
 
         const updateData = {
 
-            temperature: Number(
-                req.body.temperature
-            ),
+            temperature:
+                Number(
+                    req.body.temperature
+                ),
 
-            humidity: Number(
-                req.body.humidity
-            ),
+            humidity:
+                Number(
+                    req.body.humidity
+                ),
 
-            mq135: Number(
-                req.body.mq135 || 0
-            ),
+            mq135:
+                Number(
+                    req.body.mq135 || 0
+                ),
 
-            storage_days: Number(
-                req.body.storage_days || 0
-            ),
+            storage_days:
+                Number(
+                    req.body.storage_days || 0
+                ),
 
-            location: req.body.location,
+            location:
+                req.body.location,
 
             quality:
                 aiResponse.data.quality ||
@@ -261,7 +563,10 @@ router.put("/:id", async (req, res) => {
         );
 
         res.status(500).json({
-            message: error.message
+
+            message:
+                error.message
+
         });
 
     }
@@ -295,7 +600,10 @@ router.delete("/:id", async (req, res) => {
         );
 
         res.status(500).json({
-            message: error.message
+
+            message:
+                error.message
+
         });
 
     }
@@ -311,28 +619,37 @@ router.post("/predict", async (req, res) => {
 
     try {
 
-        const response = await axios.post(
+        const response =
+            await axios.post(
 
-            AI_URL,
+                AI_URL,
 
-            {
-                temperature: Number(
-                    req.body.temperature
-                ),
+                {
 
-                humidity: Number(
-                    req.body.humidity
-                ),
+                    temperature:
+                        Number(
+                            req.body.temperature
+                        ),
 
-                storage_days: Number(
-                    req.body.storage_days || 0
-                )
-            }
+                    humidity:
+                        Number(
+                            req.body.humidity
+                        ),
 
+                    storage_days:
+                        Number(
+                            req.body.storage_days ||
+                            0
+                        )
+
+                }
+
+            );
+
+
+        res.json(
+            response.data
         );
-
-
-        res.json(response.data);
 
     }
 
@@ -344,7 +661,10 @@ router.post("/predict", async (req, res) => {
         );
 
         res.status(500).json({
-            message: "AI prediction failed"
+
+            message:
+                "AI prediction failed"
+
         });
 
     }

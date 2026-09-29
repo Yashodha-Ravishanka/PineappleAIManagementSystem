@@ -8,59 +8,31 @@ import {
 
 import "./PineappleTable.css";
 
-
 function PineappleTable() {
-
   const [data, setData] = useState([]);
-
-  const [editItem, setEditItem] =
-    useState(null);
-
-  const [search, setSearch] =
-    useState("");
-
-  const [viewItem, setViewItem] =
-    useState(null);
-
+  const [editItem, setEditItem] = useState(null);
+  const [search, setSearch] = useState("");
+  const [viewItem, setViewItem] = useState(null);
 
   // ===============================
   // LOAD DATA
   // ===============================
 
   useEffect(() => {
-
     loadData();
-
   }, []);
 
-
   async function loadData() {
-
     try {
+      const result = await getAllPineapples();
 
-      const result =
-        await getAllPineapples();
-
-      console.log(
-        "TABLE DATA:",
-        result
-      );
+      console.log("TABLE DATA:", result);
 
       setData(result);
-
+    } catch (error) {
+      console.log("LOAD ERROR:", error);
     }
-
-    catch (error) {
-
-      console.log(
-        "LOAD ERROR:",
-        error
-      );
-
-    }
-
   }
-
 
   // ===============================
   // GET LATEST READING
@@ -69,628 +41,422 @@ function PineappleTable() {
 
   const latestByBatch = {};
 
-
   data.forEach((item) => {
+    const batchId = item.batchId || "Unknown";
 
-    const batchId =
-      item.batchId || "Unknown";
-
-
-    const existing =
-      latestByBatch[batchId];
-
+    const existing = latestByBatch[batchId];
 
     if (
       !existing ||
-      new Date(item.timestamp) >
-        new Date(existing.timestamp)
+      new Date(item.timestamp) > new Date(existing.timestamp)
     ) {
-
-      latestByBatch[batchId] =
-        item;
-
+      latestByBatch[batchId] = item;
     }
-
   });
 
-
-  const latestData =
-    Object.values(
-      latestByBatch
-    );
-
+  const latestData = Object.values(latestByBatch);
 
   // ===============================
   // EDIT
   // ===============================
 
   function editData(item) {
-
     setEditItem({
-
       ...item,
-
-      storage_days:
-        item.storage_days || 0
-
+      storage_days: item.storage_days || 0,
     });
-
   }
-
 
   // ===============================
   // SAVE UPDATE
   // ===============================
 
   async function saveUpdate() {
-
     try {
+      await updatePineapple(editItem._id, {
+        temperature: Number(editItem.temperature),
+        humidity: Number(editItem.humidity),
+        storage_days: Number(editItem.storage_days),
+        location: editItem.location,
+      });
 
-      await updatePineapple(
-
-        editItem._id,
-
-        {
-
-          temperature:
-            Number(
-              editItem.temperature
-            ),
-
-          humidity:
-            Number(
-              editItem.humidity
-            ),
-
-          storage_days:
-            Number(
-              editItem.storage_days
-            ),
-
-          location:
-            editItem.location
-
-        }
-
-      );
-
-
-      alert(
-        "AI prediction updated successfully"
-      );
-
+      alert("AI prediction updated successfully");
 
       setEditItem(null);
 
-
-      loadData();
-
+      await loadData();
 
       window.dispatchEvent(
-        new Event(
-          "pineappleAdded"
-        )
+        new Event("pineappleAdded")
       );
+    } catch (error) {
+      console.log("UPDATE ERROR:", error);
 
+      alert("Update failed");
     }
-
-    catch (error) {
-
-      console.log(
-        "UPDATE ERROR:",
-        error
-      );
-
-
-      alert(
-        "Update failed"
-      );
-
-    }
-
   }
-
 
   // ===============================
   // DELETE
   // ===============================
 
   async function removeData(id) {
-
     try {
-
       if (
-
         window.confirm(
           "Delete this pineapple batch?"
         )
-
       ) {
+        await deletePineapple(id);
 
-        await deletePineapple(
-          id
-        );
-
-
-        loadData();
-
+        await loadData();
       }
-
+    } catch (error) {
+      console.log("DELETE ERROR:", error);
     }
-
-    catch (error) {
-
-      console.log(error);
-
-    }
-
   }
-
 
   // ===============================
   // QUALITY CLASS
   // ===============================
 
   function qualityClass(value) {
-
-    switch (
-      value?.toLowerCase()
-    ) {
-
+    switch (value?.toLowerCase()) {
       case "good":
-
         return "quality-good";
 
-
       case "average":
-
         return "quality-average";
 
-
       case "bad":
-
         return "quality-bad";
 
-
       default:
-
         return "quality-pending";
-
     }
-
   }
-
 
   // ===============================
   // RISK CLASS
   // ===============================
 
   function riskClass(value) {
-
-    switch (
-      value?.toLowerCase()
-    ) {
-
+    switch (value?.toLowerCase()) {
       case "low":
-
         return "risk-low";
 
-
       case "medium":
-
         return "risk-medium";
 
-
       case "high":
-
         return "risk-high";
 
-
       default:
-
         return "risk-pending";
-
     }
-
   }
-
 
   // ===============================
   // FORMAT TIME
   // ===============================
 
   function formatTime(timestamp) {
-
     if (!timestamp) {
-
       return "N/A";
-
     }
 
+    const date = new Date(timestamp);
 
-    const date =
-      new Date(timestamp);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
+    if (Number.isNaN(date.getTime())) {
       return "N/A";
-
     }
-
 
     return date.toLocaleString();
-
   }
-
 
   // ===============================
   // SEARCH
   // ===============================
 
-  const filteredData =
-    latestData.filter(
-      (item) => {
+  const filteredData = latestData.filter((item) => {
+    const searchText = search.toLowerCase();
 
-        const searchText =
-          search.toLowerCase();
+    return (
+      (item.batchId || "")
+        .toLowerCase()
+        .includes(searchText) ||
 
+      (item.warehouseId || "")
+        .toLowerCase()
+        .includes(searchText) ||
 
-        return (
+      (item.location || "")
+        .toLowerCase()
+        .includes(searchText) ||
 
-          (item.batchId || "")
-            .toLowerCase()
-            .includes(searchText)
+      (item.quality || "")
+        .toLowerCase()
+        .includes(searchText) ||
 
-
-          ||
-
-
-          (item.location || "")
-            .toLowerCase()
-            .includes(searchText)
-
-
-          ||
-
-
-          (item.quality || "")
-            .toLowerCase()
-            .includes(searchText)
-
-
-          ||
-
-
-          (item.riskLevel || "")
-            .toLowerCase()
-            .includes(searchText)
-
-        );
-
-      }
+      (item.riskLevel || "")
+        .toLowerCase()
+        .includes(searchText)
     );
-
+  });
 
   // ===============================
   // DASHBOARD UI
   // ===============================
 
   return (
-
     <div className="table-container">
-
 
       <h2>
         🍍 Pineapple Batch Data
       </h2>
 
-
       <p
         style={{
           color: "#94a3b8",
-          marginBottom: "15px"
+          marginBottom: "15px",
         }}
       >
-        Showing the latest sensor
-        reading for each batch.
+        Showing the latest sensor reading
+        for each batch.
       </p>
-
 
       {/* ===============================
           SEARCH
           =============================== */}
 
       <input
-
         className="search-input"
-
-        placeholder=
-          "Search Batch, Location, Quality, Risk"
-
+        placeholder="Search Batch, Warehouse, Location, Quality, Risk"
         value={search}
-
-        onChange={
-          (e) =>
-            setSearch(
-              e.target.value
-            )
+        onChange={(e) =>
+          setSearch(e.target.value)
         }
-
       />
-
 
       {/* ===============================
           TABLE
           =============================== */}
 
-      <table>
+      <div
+        style={{
+          width: "100%",
+          overflowX: "auto",
+        }}
+      >
 
+        <table
+          style={{
+            minWidth: "1350px",
+          }}
+        >
 
-        <thead>
-
-          <tr>
-
-            <th>
-              Batch ID
-            </th>
-
-
-            <th>
-              Temperature
-            </th>
-
-
-            <th>
-              Humidity
-            </th>
-
-
-            <th>
-              MQ135 Raw
-            </th>
-
-
-            <th>
-              Quality
-            </th>
-
-
-            <th>
-              Risk
-            </th>
-
-
-            <th>
-              Location
-            </th>
-
-
-            <th>
-              Last Updated
-            </th>
-
-
-            <th>
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-
-          {filteredData.length === 0 ? (
+          <thead>
 
             <tr>
 
-              <td colSpan="9">
+              <th>
+                Batch ID
+              </th>
 
-                No Data Found
+              <th>
+                🏭 Warehouse
+              </th>
 
-              </td>
+              <th>
+                Temperature
+              </th>
+
+              <th>
+                Humidity
+              </th>
+
+              <th
+                style={{
+                  minWidth: "110px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                🧪 MQ135 Raw
+              </th>
+
+              <th>
+                Quality
+              </th>
+
+              <th>
+                Risk
+              </th>
+
+              <th>
+                Location
+              </th>
+
+              <th>
+                Last Updated
+              </th>
+
+              <th>
+                Action
+              </th>
 
             </tr>
 
-          ) : (
+          </thead>
 
+          <tbody>
 
-            filteredData.map(
-              (item) => (
+            {filteredData.length === 0 ? (
+
+              <tr>
+
+                <td colSpan="10">
+                  No Data Found
+                </td>
+
+              </tr>
+
+            ) : (
+
+              filteredData.map((item) => (
 
                 <tr
-                  key={
-                    item.batchId
-                  }
+                  key={item.batchId}
                 >
-
 
                   {/* Batch ID */}
 
                   <td>
-
                     {item.batchId}
-
                   </td>
 
+                  {/* Warehouse */}
+
+                  <td
+                    style={{
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    🏭{" "}
+                    {item.warehouseId || "WH-001"}
+                  </td>
 
                   {/* Temperature */}
 
                   <td>
-
-                    {item.temperature}
-                    °C
-
+                    {item.temperature} °C
                   </td>
-
 
                   {/* Humidity */}
 
                   <td>
-
-                    {item.humidity}
-                    %
-
+                    {item.humidity} %
                   </td>
-
 
                   {/* MQ135 */}
 
-                  <td>
-
-                    {item.mq135 ?? 0}
-
+                  <td
+                    style={{
+                      minWidth: "110px",
+                      fontWeight: "bold",
+                      fontSize: "16px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    🧪 {item.mq135 ?? 0}
                   </td>
-
 
                   {/* Quality */}
 
                   <td>
 
                     <span
-
-                      className={
-                        qualityClass(
-                          item.quality
-                        )
-                      }
-
+                      className={qualityClass(
+                        item.quality
+                      )}
                     >
-
-                      {
-                        item.quality ||
-                        "Pending"
-                      }
-
+                      {item.quality || "Pending"}
                     </span>
 
                   </td>
-
 
                   {/* Risk */}
 
                   <td>
 
                     <span
-
-                      className={
-                        riskClass(
-                          item.riskLevel
-                        )
-                      }
-
+                      className={riskClass(
+                        item.riskLevel
+                      )}
                     >
-
-                      {
-                        item.riskLevel ||
-                        "Pending"
-                      }
-
+                      {item.riskLevel || "Pending"}
                     </span>
 
                   </td>
 
-
                   {/* Location */}
 
                   <td>
-
-                    {item.location}
-
+                    {item.location || "N/A"}
                   </td>
 
-
-                  {/* Timestamp */}
+                  {/* Last Updated */}
 
                   <td>
-
-                    {
-                      formatTime(
-                        item.timestamp
-                      )
-                    }
-
+                    {formatTime(
+                      item.timestamp
+                    )}
                   </td>
-
 
                   {/* Actions */}
 
                   <td>
 
-
                     <button
-
                       className="view-btn"
-
                       onClick={() =>
-                        setViewItem(
-                          item
-                        )
+                        setViewItem(item)
                       }
-
                     >
-
                       View
-
                     </button>
 
-
                     <button
-
                       className="edit-btn"
-
                       onClick={() =>
-                        editData(
-                          item
-                        )
+                        editData(item)
                       }
-
                     >
-
                       Edit
-
                     </button>
-
 
                     <button
-
                       className="delete-btn"
-
                       onClick={() =>
-                        removeData(
-                          item._id
-                        )
+                        removeData(item._id)
                       }
-
                     >
-
                       Delete
-
                     </button>
-
 
                   </td>
 
-
                 </tr>
 
-              )
-            )
+              ))
 
-          )}
+            )}
 
+          </tbody>
 
-        </tbody>
+        </table>
 
-      </table>
-
+      </div>
 
       {/* ===============================
           VIEW DETAILS
@@ -700,121 +466,83 @@ function PineappleTable() {
 
         <div className="edit-overlay">
 
-
           <div className="details-box">
-
 
             <h2>
               🍍 Batch Details
             </h2>
 
-
             <p>
-
               <strong>
                 Batch ID:
               </strong>{" "}
-
               {viewItem.batchId}
-
             </p>
 
+            <p>
+              <strong>
+                🏭 Warehouse:
+              </strong>{" "}
+              {viewItem.warehouseId || "WH-001"}
+            </p>
 
             <p>
-
               <strong>
                 🌡 Temperature:
               </strong>{" "}
-
-              {viewItem.temperature}
-              °C
-
+              {viewItem.temperature} °C
             </p>
 
-
             <p>
-
               <strong>
                 💧 Humidity:
               </strong>{" "}
-
-              {viewItem.humidity}
-              %
-
+              {viewItem.humidity} %
             </p>
 
-
             <p>
-
               <strong>
-                MQ135 Raw:
+                🧪 MQ135 Raw:
               </strong>{" "}
-
               {viewItem.mq135 ?? 0}
-
             </p>
 
-
             <p>
-
               <strong>
                 📅 Storage Days:
               </strong>{" "}
-
-              {viewItem.storage_days}
-
+              {viewItem.storage_days ?? 0}
             </p>
 
-
             <p>
-
               <strong>
                 ⭐ Quality:
               </strong>{" "}
 
-
               <span
-                className={
-                  qualityClass(
-                    viewItem.quality
-                  )
-                }
+                className={qualityClass(
+                  viewItem.quality
+                )}
               >
-
-                {
-                  viewItem.quality ||
-                  "Pending"
-                }
-
+                {viewItem.quality || "Pending"}
               </span>
 
             </p>
 
-
             <p>
-
               <strong>
                 ⚠ Risk:
               </strong>{" "}
 
-
               <span
-                className={
-                  riskClass(
-                    viewItem.riskLevel
-                  )
-                }
+                className={riskClass(
+                  viewItem.riskLevel
+                )}
               >
-
-                {
-                  viewItem.riskLevel ||
-                  "Pending"
-                }
-
+                {viewItem.riskLevel || "Pending"}
               </span>
 
             </p>
-
 
             <p>
 
@@ -822,17 +550,12 @@ function PineappleTable() {
                 🤖 Recommendation:
               </strong>
 
-
               <br />
 
-
-              {
-                viewItem.recommendation ||
-                "No recommendation available."
-              }
+              {viewItem.recommendation ||
+                "No recommendation available."}
 
             </p>
-
 
             <p>
 
@@ -840,10 +563,9 @@ function PineappleTable() {
                 📍 Location:
               </strong>{" "}
 
-              {viewItem.location}
+              {viewItem.location || "N/A"}
 
             </p>
-
 
             <p>
 
@@ -851,36 +573,26 @@ function PineappleTable() {
                 🕒 Last Updated:
               </strong>{" "}
 
-              {
-                formatTime(
-                  viewItem.timestamp
-                )
-              }
+              {formatTime(
+                viewItem.timestamp
+              )}
 
             </p>
 
-
             <button
-
               className="cancel-btn"
-
               onClick={() =>
                 setViewItem(null)
               }
-
             >
-
               Close
-
             </button>
-
 
           </div>
 
         </div>
 
       )}
-
 
       {/* ===============================
           EDIT BATCH
@@ -890,174 +602,114 @@ function PineappleTable() {
 
         <div className="edit-overlay">
 
-
           <div className="edit-box">
-
 
             <h3>
               🍍 Edit Pineapple Batch
             </h3>
 
+            <p
+              style={{
+                color: "#94a3b8",
+                marginBottom: "15px",
+              }}
+            >
+              🏭 Warehouse:{" "}
+              {editItem.warehouseId || "WH-001"}
+            </p>
 
             <label>
               Temperature °C
             </label>
 
-
             <input
-
               type="number"
-
               value={
-                editItem.temperature ||
-                ""
+                editItem.temperature ?? ""
               }
-
-              onChange={
-                (e) =>
-
-                  setEditItem({
-
-                    ...editItem,
-
-                    temperature:
-                      e.target.value
-
-                  })
-
+              onChange={(e) =>
+                setEditItem({
+                  ...editItem,
+                  temperature:
+                    e.target.value,
+                })
               }
-
             />
-
 
             <label>
               Humidity %
             </label>
 
-
             <input
-
               type="number"
-
               value={
-                editItem.humidity ||
-                ""
+                editItem.humidity ?? ""
               }
-
-              onChange={
-                (e) =>
-
-                  setEditItem({
-
-                    ...editItem,
-
-                    humidity:
-                      e.target.value
-
-                  })
-
+              onChange={(e) =>
+                setEditItem({
+                  ...editItem,
+                  humidity:
+                    e.target.value,
+                })
               }
-
             />
-
 
             <label>
               Storage Days
             </label>
 
-
             <input
-
               type="number"
-
               value={
-                editItem.storage_days ||
-                ""
+                editItem.storage_days ?? ""
               }
-
-              onChange={
-                (e) =>
-
-                  setEditItem({
-
-                    ...editItem,
-
-                    storage_days:
-                      e.target.value
-
-                  })
-
+              onChange={(e) =>
+                setEditItem({
+                  ...editItem,
+                  storage_days:
+                    e.target.value,
+                })
               }
-
             />
-
 
             <label>
               Location
             </label>
 
-
             <input
-
               type="text"
-
               value={
-                editItem.location ||
-                ""
+                editItem.location || ""
               }
-
-              onChange={
-                (e) =>
-
-                  setEditItem({
-
-                    ...editItem,
-
-                    location:
-                      e.target.value
-
-                  })
-
+              onChange={(e) =>
+                setEditItem({
+                  ...editItem,
+                  location:
+                    e.target.value,
+                })
               }
-
             />
-
 
             <p>
               🤖 AI will recalculate
               Quality and Risk
             </p>
 
-
             <button
-
               className="save-btn"
-
-              onClick={
-                saveUpdate
-              }
-
+              onClick={saveUpdate}
             >
-
               Save Update
-
             </button>
 
-
             <button
-
               className="cancel-btn"
-
               onClick={() =>
                 setEditItem(null)
               }
-
             >
-
               Cancel
-
             </button>
-
 
           </div>
 
@@ -1065,12 +717,8 @@ function PineappleTable() {
 
       )}
 
-
     </div>
-
   );
-
 }
-
 
 export default PineappleTable;

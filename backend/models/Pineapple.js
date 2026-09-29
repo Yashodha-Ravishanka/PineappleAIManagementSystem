@@ -7,6 +7,13 @@ const pineappleSchema = new mongoose.Schema({
     required: true
   },
 
+  // Warehouse identifier
+  warehouseId: {
+    type: String,
+    required: true,
+    default: "WH-001"
+  },
+
   temperature: {
     type: Number,
     required: true
@@ -42,6 +49,7 @@ const pineappleSchema = new mongoose.Schema({
     default: "Monitor batch"
   },
 
+  // GPS coordinates / location
   location: {
     type: String,
     required: true
