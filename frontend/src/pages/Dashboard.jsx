@@ -243,6 +243,49 @@ function Dashboard() {
 
 
   // ===============================
+  // MQ135 PROJECT CALIBRATION
+  // ===============================
+
+  const MQ135_BASELINE = 26.03;
+
+
+  let mq135Status = "";
+
+  let mq135Color = "";
+
+
+  if (latestMQ135 <= 31) {
+
+    mq135Status =
+      "Normal";
+
+    mq135Color =
+      "#16a34a";
+
+  }
+
+  else if (latestMQ135 <= 39) {
+
+    mq135Status =
+      "Warning";
+
+    mq135Color =
+      "#facc15";
+
+  }
+
+  else {
+
+    mq135Status =
+      "High";
+
+    mq135Color =
+      "#dc2626";
+
+  }
+
+
+  // ===============================
   // ENVIRONMENT STATUS
   // ===============================
 
@@ -476,6 +519,79 @@ function Dashboard() {
 
 
       {/* ===============================
+          MQ135 AIR QUALITY STATUS
+          =============================== */}
+
+      <div
+        className="environment-card"
+        style={{
+          borderLeft:
+            "8px solid " +
+            mq135Color
+        }}
+      >
+
+        <h2>
+          🫁 MQ135 Air Quality
+        </h2>
+
+
+        <p>
+
+          Calibration Baseline:
+
+          <strong>
+
+            {" " +
+              MQ135_BASELINE}
+
+          </strong>
+
+        </p>
+
+
+        <p>
+
+          Current Raw Value:
+
+          <strong>
+
+            {" " +
+              latestMQ135}
+
+          </strong>
+
+        </p>
+
+
+        <h3
+          style={{
+            color: mq135Color
+          }}
+        >
+
+          {mq135Status}
+
+        </h3>
+
+
+        <p
+          style={{
+            fontSize: "14px",
+            marginTop: "8px"
+          }}
+        >
+
+          Project-specific monitoring status
+          based on the calibrated clean-air
+          baseline.
+
+        </p>
+
+      </div>
+
+
+      {/* ===============================
           GPS TRACKING
           =============================== */}
 
@@ -554,4 +670,3 @@ function Dashboard() {
 
 
 export default Dashboard;
-
