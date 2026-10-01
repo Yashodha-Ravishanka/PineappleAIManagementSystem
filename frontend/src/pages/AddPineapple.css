@@ -1,151 +1,543 @@
-.add-container {
+/* =========================================================
+   ADD PINEAPPLE PAGE
+   ========================================================= */
 
-    width: 500px;
-
-    max-width: 90%;
-
-    margin: 50px auto;
-
-    padding: 35px;
-
+.add-pineapple {
+    min-height: 100vh;
+    width: 100%;
+    padding: 40px;
+    box-sizing: border-box;
 
     background:
-    rgba(255,255,255,0.08);
+        radial-gradient(
+            circle at top left,
+            rgba(34, 197, 94, 0.12),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #052e16,
+            #0f172a 55%,
+            #020617
+        );
 
+    color: white;
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.add-pineapple > form,
+.add-pineapple > .environment-card,
+.add-pineapple > .photo-ai-section {
+    width: 650px;
+    max-width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
+
+.add-pineapple > h2 {
+    width: 650px;
+    max-width: 95%;
+    margin: 0 auto 30px;
+
+    color: #facc15;
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.add-pineapple form {
+    padding: 30px;
+
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 20px;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.20);
+
+    backdrop-filter: blur(12px);
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.add-pineapple label {
+    display: block;
+    margin-bottom: 7px;
+
+    color: rgba(255, 255, 255, 0.85);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.add-pineapple input,
+.add-pineapple select {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 13px 15px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+
+    color: white;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+
+    outline: none;
+
+    transition: 0.2s ease;
+}
+
+/* Placeholder */
+
+.add-pineapple input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* Focus */
+
+.add-pineapple input:focus,
+.add-pineapple select:focus {
+    border-color: rgba(250, 204, 21, 0.6);
+
+    background: rgba(255, 255, 255, 0.10);
+
+    box-shadow:
+        0 0 10px rgba(250, 204, 21, 0.18);
+}
+
+/* Select dropdown */
+
+.add-pineapple select option {
+    background: #0f172a;
+    color: white;
+}
+
+/* =========================================================
+   WAREHOUSE ENVIRONMENT
+   ========================================================= */
+
+.environment-card {
+    margin-top: 25px;
+    margin-bottom: 25px;
+
+    padding: 23px 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.09),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.22);
 
     backdrop-filter: blur(12px);
 
+    color: white;
+}
 
-    border-radius: 25px;
+/* Environment title */
 
+.environment-card h3 {
+    margin: 0 0 18px;
 
-    border:
-    1px solid rgba(255,255,255,0.15);
+    color: #facc15;
 
+    font-size: 21px;
+    font-weight: 700;
+
+    text-align: center;
+}
+
+/* Environment rows */
+
+.environment-card p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 10px 0;
+    padding: 11px 14px;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    border-radius: 10px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 14px;
+}
+
+/* Values */
+
+.environment-card strong {
+    color: white;
+}
+
+/* =========================================================
+   PHOTO AI SECTION
+   ========================================================= */
+
+.photo-ai-section {
+    margin-top: 25px;
+    margin-bottom: 25px;
+
+    padding: 23px;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 18px;
 
     box-shadow:
-    0 10px 30px rgba(0,0,0,0.3);
+        0 10px 25px rgba(0, 0, 0, 0.18);
 
-
-    color:white;
-
+    box-sizing: border-box;
 }
 
+/* Photo AI heading */
 
+.photo-ai-section h3 {
+    margin: 0 0 18px;
 
-.add-container h1 {
+    color: #facc15;
 
-    text-align:center;
-
-    color:#facc15;
-
-    margin-bottom:30px;
-
-    font-size:30px;
-
+    font-size: 21px;
+    font-weight: 700;
 }
 
+/* =========================================================
+   FILE INPUT
+   ========================================================= */
 
+.add-pineapple input[type="file"] {
+    padding: 10px;
 
-/* Inputs */
+    background: rgba(255, 255, 255, 0.08);
 
-.add-container input {
+    color: rgba(255, 255, 255, 0.80);
 
-    width:100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 
-    padding:14px;
-
-    margin:12px 0;
-
-
-    border:none;
-
-    border-radius:12px;
-
-
-    outline:none;
-
-
-    font-size:16px;
-
+    cursor: pointer;
 }
 
+/* =========================================================
+   IMAGE PREVIEW
+   ========================================================= */
 
+.photo-ai-section img {
+    display: block;
 
-/* Input focus */
+    width: 250px;
+    max-width: 100%;
 
-.add-container input:focus {
+    margin: 18px auto;
+
+    border-radius: 14px;
+
+    border: 2px solid rgba(250, 204, 21, 0.25);
 
     box-shadow:
-    0 0 10px rgba(250,204,21,0.5);
-
+        0 10px 25px rgba(0, 0, 0, 0.30);
 }
 
+/* =========================================================
+   GREEN BUTTONS
+   SAME AS DASHBOARD
+   ========================================================= */
 
+.add-pineapple button[type="button"],
+.add-pineapple button[type="submit"] {
+    background: #166534;
+    color: white;
 
-/* Button */
+    border: none;
+    border-radius: 10px;
 
-.add-container button {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
 
+    cursor: pointer;
 
-    width:100%;
-
-
-    padding:15px;
-
-
-    margin-top:20px;
-
-
-    background:#166534;
-
-
-    color:white;
-
-
-    border:none;
-
-
-    border-radius:12px;
-
-
-    font-size:17px;
-
-
-    font-weight:bold;
-
-
-    cursor:pointer;
-
-
-    transition:0.3s;
-
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-
-
-.add-container button:hover {
-
-
-    background:#22c55e;
-
-
-    transform:translateY(-3px);
-
+.add-pineapple button[type="button"] {
+    padding: 12px 20px;
 }
 
+.add-pineapple button[type="submit"] {
+    width: 100%;
+    padding: 15px;
 
+    margin-top: 20px;
 
-/* Mobile */
+    font-size: 16px;
+    font-weight: 700;
+}
 
-@media(max-width:600px){
+/* Hover */
 
+.add-pineapple button[type="button"]:hover,
+.add-pineapple button[type="submit"]:hover {
+    background: #22c55e;
 
-    .add-container{
+    transform: translateY(-2px);
 
-        padding:25px;
+    box-shadow:
+        0 8px 18px rgba(34, 197, 94, 0.20);
+}
 
+/* Disabled */
+
+.add-pineapple button:disabled {
+    background: #4b5563;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+/* =========================================================
+   PHOTO AI RESULTS
+   ========================================================= */
+
+.photo-ai-results {
+    margin-top: 20px;
+    padding: 18px;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    border-radius: 14px;
+
+    color: white;
+}
+
+.photo-ai-results h3 {
+    margin: 0 0 15px;
+
+    color: #facc15;
+}
+
+.photo-ai-results p {
+    margin: 8px 0;
+
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.photo-ai-results strong {
+    color: white;
+}
+
+/* =========================================================
+   QR MODAL
+   ========================================================= */
+
+.qr-modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.75);
+
+    backdrop-filter: blur(6px);
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+}
+
+.qr-modal {
+    width: 420px;
+    max-width: 95%;
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: 35px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #052e16,
+            #0f172a 55%,
+            #020617
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.60);
+
+    color: white;
+
+    text-align: center;
+}
+
+.qr-modal h2,
+.qr-modal h3 {
+    color: #facc15;
+}
+
+/* QR image */
+
+.qr-image {
+    width: 260px;
+    height: 260px;
+
+    max-width: 80%;
+
+    object-fit: contain;
+
+    background: white;
+
+    padding: 12px;
+
+    border-radius: 15px;
+
+    margin: 10px auto 20px;
+
+    display: block;
+}
+
+/* QR details */
+
+.qr-details {
+    background: rgba(255, 255, 255, 0.06);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    margin-bottom: 20px;
+
+    text-align: left;
+}
+
+.qr-details p {
+    margin: 8px 0;
+
+    font-size: 14px;
+}
+
+.qr-details strong {
+    color: #facc15;
+}
+
+/* QR buttons */
+
+.qr-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.qr-buttons button {
+    flex: 1;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.qr-dashboard-button {
+    background: #166534;
+    color: white;
+}
+
+.qr-dashboard-button:hover {
+    background: #22c55e;
+}
+
+.qr-close-button {
+    background: #374151;
+    color: white;
+}
+
+.qr-close-button:hover {
+    background: #4b5563;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .add-pineapple {
+        padding: 25px 15px;
     }
 
+    .add-pineapple form,
+    .add-pineapple > .environment-card,
+    .add-pineapple > .photo-ai-section,
+    .add-pineapple > h2 {
+        width: 100%;
+        max-width: 100%;
+    }
 
+    .add-pineapple form {
+        padding: 20px;
+    }
+
+    .environment-card p {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .qr-buttons {
+        flex-direction: column;
+    }
 }

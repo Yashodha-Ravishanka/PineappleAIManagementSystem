@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -10,10 +9,17 @@ app = Flask(__name__)
 
 CORS(app)
 
-# Load trained AI model
+# ==========================================
+# LOAD TRAINED AI MODEL
+# ==========================================
+
 model = joblib.load("model.pkl")
 encoder = joblib.load("encoder.pkl")
 
+
+# ==========================================
+# HOME
+# ==========================================
 
 @app.route("/")
 def home():
@@ -21,77 +27,192 @@ def home():
     return "Pineapple AI Prediction Service Running"
 
 
+# ==========================================
+# AI PREDICTION
+# ==========================================
+
 @app.route("/predict", methods=["POST"])
 def predict():
 
-    data = request.json
+    try:
 
-    temperature = float(data["temperature"])
-    humidity = float(data["humidity"])
-    storage_days = int(data["storage_days"])
+        data = request.json
 
-    input_data = pd.DataFrame([{
+        # ------------------------------------------
+        # GET INPUT VALUES
+        # ------------------------------------------
 
-        "temperature": temperature,
+        temperature = float(data["temperature"])
+        humidity = float(data["humidity"])
+        storage_days = int(data["storage_days"])
 
-        "humidity": humidity,
+        # MQ135 is received from ESP32/backend.
+        # The current trained model does not use it
+        # because the model was trained with only:
+        # temperature, humidity, storage_days
 
-        "storage_days": storage_days
+        mq135 = float(data.get("mq135", 0))
 
-    }])
 
-    prediction = model.predict(input_data)
+        # ------------------------------------------
+        # CREATE AI INPUT
+        # ------------------------------------------
 
-    quality = encoder.inverse_transform(prediction)[0]
+        input_data = pd.DataFrame([{
 
-    # Risk Level
-    if quality == "Bad":
+            "temperature": temperature,
 
-        risk = "High"
+            "humidity": humidity,
 
-    elif quality == "Average":
+            "storage_days": storage_days
 
-        risk = "Medium"
+        }])
 
-    else:
 
-        risk = "Low"
+        # ------------------------------------------
+        # AI MODEL PREDICTION
+        # ------------------------------------------
 
-    # AI Recommendation
-    if quality == "Good":
+        prediction = model.predict(input_data)
 
-        recommendation = (
-            "Continue normal storage. "
-            "Maintain current temperature and humidity."
-        )
+        quality = encoder.inverse_transform(prediction)[0]
 
-    elif quality == "Average":
 
-        recommendation = (
-            "Monitor temperature and humidity daily. "
-            "Inspect the batch regularly."
-        )
+        # ------------------------------------------
+        # AI CONFIDENCE
+        # ------------------------------------------
 
-    elif quality == "Bad":
+        confidence = None
 
-        recommendation = (
-            "Move to cold storage immediately or prioritize sale."
-        )
+        if hasattr(model, "predict_proba"):
 
-    else:
+            probabilities = model.predict_proba(input_data)[0]
 
-        recommendation = "Monitor batch."
+            confidence = float(max(probabilities))
 
-    return jsonify({
 
-        "quality": quality,
+        # ------------------------------------------
+        # QUALITY GRADE
+        # ------------------------------------------
+        #
+        # Grade is based on the AI model confidence.
+        #
+        # A = very high confidence
+        # B = high confidence
+        # C = moderate confidence
+        # D = low confidence
+        #
+        # This is calculated by the AI service,
+        # not by the React frontend.
+        # ------------------------------------------
 
-        "risk": risk,
+        if confidence is not None:
 
-        "recommendation": recommendation
+            if confidence >= 0.90:
 
-    })
+                quality_grade = "A"
 
+            elif confidence >= 0.75:
+
+                quality_grade = "B"
+
+            elif confidence >= 0.60:
+
+                quality_grade = "C"
+
+            else:
+
+                quality_grade = "D"
+
+        else:
+
+            # If the model does not support
+            # predict_proba(), we cannot calculate
+            # confidence-based grading.
+
+            quality_grade = "Pending"
+
+
+        # ------------------------------------------
+        # RISK LEVEL
+        # ------------------------------------------
+
+        if quality == "Bad":
+
+            risk = "High"
+
+        elif quality == "Average":
+
+            risk = "Medium"
+
+        else:
+
+            risk = "Low"
+
+
+        # ------------------------------------------
+        # AI RECOMMENDATION
+        # ------------------------------------------
+
+        if quality == "Good":
+
+            recommendation = (
+                "Continue normal storage. "
+                "Maintain current temperature and humidity."
+            )
+
+        elif quality == "Average":
+
+            recommendation = (
+                "Monitor temperature and humidity daily. "
+                "Inspect the batch regularly."
+            )
+
+        elif quality == "Bad":
+
+            recommendation = (
+                "Move to cold storage immediately "
+                "or prioritize sale."
+            )
+
+        else:
+
+            recommendation = "Monitor batch."
+
+
+        # ------------------------------------------
+        # RETURN AI RESULT
+        # ------------------------------------------
+
+        return jsonify({
+
+            "quality": quality,
+
+            "qualityGrade": quality_grade,
+
+            "confidence": confidence,
+
+            "risk": risk,
+
+            "recommendation": recommendation
+
+        })
+
+
+    except Exception as e:
+
+        print("AI ERROR:", str(e))
+
+        return jsonify({
+
+            "error": str(e)
+
+        }), 500
+
+
+# ==========================================
+# START SERVER
+# ==========================================
 
 if __name__ == "__main__":
 

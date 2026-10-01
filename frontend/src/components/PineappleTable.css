@@ -438,6 +438,9 @@
     border: 1px solid transparent;
 }
 
+
+/* GOOD */
+
 .quality-good {
     background:
         rgba(34, 197, 94, 0.15);
@@ -447,6 +450,9 @@
 
     color: #86efac;
 }
+
+
+/* AVERAGE */
 
 .quality-average {
     background:
@@ -458,6 +464,9 @@
     color: #fde68a;
 }
 
+
+/* BAD */
+
 .quality-bad {
     background:
         rgba(239, 68, 68, 0.15);
@@ -468,6 +477,9 @@
     color: #fca5a5;
 }
 
+
+/* PENDING */
+
 .quality-pending {
     background:
         rgba(100, 116, 139, 0.18);
@@ -476,6 +488,120 @@
         rgba(100, 116, 139, 0.30);
 
     color: #cbd5e1;
+}
+
+
+/* =========================================================
+   AI QUALITY GRADE BADGES
+   ========================================================= */
+
+.quality-grade {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 42px;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    border: 1px solid transparent;
+
+    box-sizing: border-box;
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+.quality-grade:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+
+/* =========================================================
+   GRADE A
+   ========================================================= */
+
+.grade-a {
+    background:
+        rgba(34, 197, 94, 0.15);
+
+    border-color:
+        rgba(34, 197, 94, 0.35);
+
+    color:
+        #86efac;
+}
+
+
+/* =========================================================
+   GRADE B
+   ========================================================= */
+
+.grade-b {
+    background:
+        rgba(59, 130, 246, 0.15);
+
+    border-color:
+        rgba(59, 130, 246, 0.35);
+
+    color:
+        #93c5fd;
+}
+
+
+/* =========================================================
+   GRADE C
+   ========================================================= */
+
+.grade-c {
+    background:
+        rgba(250, 204, 21, 0.15);
+
+    border-color:
+        rgba(250, 204, 21, 0.35);
+
+    color:
+        #fde68a;
+}
+
+
+/* =========================================================
+   GRADE D
+   ========================================================= */
+
+.grade-d {
+    background:
+        rgba(239, 68, 68, 0.15);
+
+    border-color:
+        rgba(239, 68, 68, 0.35);
+
+    color:
+        #fca5a5;
+}
+
+
+/* =========================================================
+   GRADE PENDING
+   ========================================================= */
+
+.grade-pending {
+    background:
+        rgba(100, 116, 139, 0.18);
+
+    border-color:
+        rgba(100, 116, 139, 0.30);
+
+    color:
+        #cbd5e1;
 }
 
 
@@ -1201,4 +1327,5 @@
     .modal-actions {
         grid-template-columns: 1fr;
     }
+
 }

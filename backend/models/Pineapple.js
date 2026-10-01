@@ -2,67 +2,107 @@ const mongoose = require("mongoose");
 
 const pineappleSchema = new mongoose.Schema({
 
-  batchId: {
-    type: String,
-    required: true
-  },
+    // ==========================================
+    // BATCH INFORMATION
+    // ==========================================
 
-  // Warehouse identifier
-  warehouseId: {
-    type: String,
-    required: true,
-    default: "WH-001"
-  },
+    batchId: {
+        type: String,
+        required: true
+    },
 
-  temperature: {
-    type: Number,
-    required: true
-  },
+    // Warehouse identifier
+    warehouseId: {
+        type: String,
+        required: true,
+        default: "WH-001"
+    },
 
-  humidity: {
-    type: Number,
-    required: true
-  },
 
-  mq135: {
-    type: Number,
-    default: 0
-  },
+    // ==========================================
+    // SENSOR DATA
+    // ==========================================
 
-  storage_days: {
-    type: Number,
-    required: true
-  },
+    temperature: {
+        type: Number,
+        required: true
+    },
 
-  quality: {
-    type: String,
-    default: "Pending"
-  },
+    humidity: {
+        type: Number,
+        required: true
+    },
 
-  riskLevel: {
-    type: String,
-    default: "Pending"
-  },
+    mq135: {
+        type: Number,
+        default: 0
+    },
 
-  recommendation: {
-    type: String,
-    default: "Monitor batch"
-  },
+    storage_days: {
+        type: Number,
+        required: true
+    },
 
-  // GPS coordinates / location
-  location: {
-    type: String,
-    required: true
-  },
 
-  timestamp: {
-    type: Date,
-    default: Date.now
-  }
+    // ==========================================
+    // AI RESULTS
+    // ==========================================
+
+    // AI predicted quality
+    // Example: Good / Average / Bad
+    quality: {
+        type: String,
+        default: "Pending"
+    },
+
+    // AI calculated quality grade
+    // Example: A / B / C / D
+    qualityGrade: {
+        type: String,
+        default: "Pending"
+    },
+
+    // AI confidence/quality score
+    // Can be used if the AI service returns a numerical score
+    qualityScore: {
+        type: Number,
+        default: 0
+    },
+
+    // AI calculated risk
+    // Example: Low / Medium / High
+    riskLevel: {
+        type: String,
+        default: "Pending"
+    },
+
+    // AI recommendation
+    recommendation: {
+        type: String,
+        default: "Monitor batch"
+    },
+
+
+    // ==========================================
+    // LOCATION
+    // ==========================================
+
+    // GPS coordinates or warehouse location
+    location: {
+        type: String,
+        required: true
+    },
+
+
+    // ==========================================
+    // TIMESTAMP
+    // ==========================================
+
+    timestamp: {
+        type: Date,
+        default: Date.now
+    }
 
 });
 
-module.exports = mongoose.model(
-  "Pineapple",
-  pineappleSchema
-);
+module.exports = mongoose.model("Pineapple", pineappleSchema);

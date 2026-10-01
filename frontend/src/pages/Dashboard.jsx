@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import VehicleEnvironment from "../components/VehicleEnvironment";
@@ -8,6 +7,7 @@ import ReportExport from "../components/ReportExport";
 import StatusCard from "../components/StatusCard";
 import AIPrediction from "../components/AIPrediction";
 import AIPricePrediction from "../components/AIPricePrediction";
+import ImagePrediction from "../components/ImagePrediction/ImagePrediction";
 import RiskChart from "../components/RiskChart";
 import TemperatureChart from "../components/TemperatureChart";
 import HumidityChart from "../components/HumidityChart";
@@ -21,6 +21,9 @@ import "./Dashboard.css";
 function Dashboard() {
 
   const [data, setData] = useState([]);
+
+  // Latest warehouse ESP32 sensor reading
+  const [environment, setEnvironment] = useState(null);
 
 
   // ===============================
@@ -65,9 +68,17 @@ function Dashboard() {
   }, []);
 
 
+  // ===============================
+  // LOAD DATABASE + SENSOR DATA
+  // ===============================
+
   async function loadData() {
 
     try {
+
+      // =================================
+      // LOAD PINEAPPLE BATCH DATA
+      // =================================
 
       const result =
         await getAllPineapples();
@@ -77,6 +88,42 @@ function Dashboard() {
           ? result
           : []
       );
+
+
+      // =================================
+      // LOAD LATEST WAREHOUSE SENSOR DATA
+      // =================================
+
+      const environmentResponse =
+        await fetch(
+          "http://localhost:3000/api/pineapple/environment/latest?warehouseId=WH-001"
+        );
+
+
+      if (environmentResponse.ok) {
+
+        const environmentData =
+          await environmentResponse.json();
+
+
+        console.log(
+          "LATEST WAREHOUSE ENVIRONMENT:",
+          environmentData
+        );
+
+
+        setEnvironment(
+          environmentData
+        );
+
+      }
+      else {
+
+        console.log(
+          "No latest warehouse environment data"
+        );
+
+      }
 
     }
     catch (error) {
@@ -231,24 +278,73 @@ function Dashboard() {
 
 
   // ===============================
-  // LATEST MQ135
+  // LIVE ESP32 TEMPERATURE
+  // ===============================
+
+  const liveTemperature =
+    environment
+      ? Number(
+          environment.temperature || 0
+        )
+      : Number(
+          latestBatch?.temperature || 0
+        );
+
+
+  // ===============================
+  // LIVE ESP32 HUMIDITY
+  // ===============================
+
+  const liveHumidity =
+    environment
+      ? Number(
+          environment.humidity || 0
+        )
+      : Number(
+          latestBatch?.humidity || 0
+        );
+
+
+  // ===============================
+  // LIVE ESP32 MQ135 RAW VALUE
   // ===============================
 
   const latestMQ135 =
-    latestBatch
-
+    environment
       ? Number(
-          latestBatch.mq135 || 0
+          environment.mq135 || 0
         )
+      : Number(
+          latestBatch?.mq135 || 0
+        );
 
-      : 0;
+
+  // ===============================
+  // LIVE SENSOR LOCATION
+  // ===============================
+
+  const sensorLocation =
+    environment?.location ||
+    latestBatch?.location ||
+    "Gampaha";
+
+
+  // ===============================
+  // SENSOR TIMESTAMP
+  // ===============================
+
+  const sensorTimestamp =
+    environment?.timestamp ||
+    latestBatch?.timestamp ||
+    null;
 
 
   // ===============================
   // MQ135 PROJECT CALIBRATION
   // ===============================
 
-  const MQ135_BASELINE = 26.03;
+  const MQ135_BASELINE =
+    26.03;
 
 
   let mq135Status = "";
@@ -291,16 +387,13 @@ function Dashboard() {
   // ENVIRONMENT STATUS
   // ===============================
 
-  const avgTemp =
-    Number(
-      averageTemperature
-    );
+  // Use LIVE ESP32 values
+  const currentTemperature =
+    liveTemperature;
 
 
-  const avgHumidity =
-    Number(
-      averageHumidity
-    );
+  const currentHumidity =
+    liveHumidity;
 
 
   let environmentStatus = "";
@@ -309,8 +402,8 @@ function Dashboard() {
 
 
   if (
-    avgTemp <= 28 &&
-    avgHumidity <= 70
+    currentTemperature <= 28 &&
+    currentHumidity <= 70
   ) {
 
     environmentStatus =
@@ -322,8 +415,8 @@ function Dashboard() {
   }
 
   else if (
-    avgTemp <= 33 &&
-    avgHumidity <= 85
+    currentTemperature <= 33 &&
+    currentHumidity <= 85
   ) {
 
     environmentStatus =
@@ -349,9 +442,13 @@ function Dashboard() {
   // FIXED WAREHOUSE LOCATION
   // ===============================
 
-  const WAREHOUSE_LATITUDE = 7.243556;
+  const WAREHOUSE_LATITUDE =
+    7.243556;
 
-  const WAREHOUSE_LONGITUDE = 80.022711;
+
+  const WAREHOUSE_LONGITUDE =
+    80.022711;
+
 
   const warehouseMapsURL =
     `https://www.google.com/maps?q=${WAREHOUSE_LATITUDE},${WAREHOUSE_LONGITUDE}`;
@@ -417,12 +514,14 @@ function Dashboard() {
             icon="📡"
           />
 
+
           <StatusCard
             title="Active Batches"
             value={activeBatches}
             type="total"
             icon="🍍"
           />
+
 
           <StatusCard
             title="Good"
@@ -431,12 +530,14 @@ function Dashboard() {
             icon="✅"
           />
 
+
           <StatusCard
             title="Average"
             value={averageCount}
             type="warning"
             icon="⚠️"
           />
+
 
           <StatusCard
             title="Bad"
@@ -445,12 +546,14 @@ function Dashboard() {
             icon="❌"
           />
 
+
           <StatusCard
             title="High Risk"
             value={highRiskCount}
             type="high-risk"
             icon="🔴"
           />
+
 
           <StatusCard
             title="Medium Risk"
@@ -459,6 +562,7 @@ function Dashboard() {
             icon="🟠"
           />
 
+
           <StatusCard
             title="Low Risk"
             value={lowRiskCount}
@@ -466,19 +570,28 @@ function Dashboard() {
             icon="🟢"
           />
 
+
+          {/* LIVE TEMPERATURE */}
+
           <StatusCard
-            title="Avg Temperature"
-            value={`${averageTemperature} °C`}
+            title="Temperature"
+            value={`${liveTemperature} °C`}
             type="temperature"
             icon="🌡️"
           />
 
+
+          {/* LIVE HUMIDITY */}
+
           <StatusCard
-            title="Avg Humidity"
-            value={`${averageHumidity} %`}
+            title="Humidity"
+            value={`${liveHumidity} %`}
             type="humidity"
             icon="💧"
           />
+
+
+          {/* LIVE MQ135 */}
 
           <StatusCard
             title="MQ135 Raw Value"
@@ -486,6 +599,87 @@ function Dashboard() {
             type="air"
             icon="🌫️"
           />
+
+        </div>
+
+
+        {/* ===============================
+            LIVE SENSOR INFORMATION
+            =============================== */}
+
+        <div className="environment-card">
+
+          <h2>
+            📡 Live Warehouse Sensor Data
+          </h2>
+
+
+          <p>
+
+            Temperature:
+
+            <strong>
+              {" " +
+                liveTemperature +
+                " °C"}
+            </strong>
+
+          </p>
+
+
+          <p>
+
+            Humidity:
+
+            <strong>
+              {" " +
+                liveHumidity +
+                " %"}
+            </strong>
+
+          </p>
+
+
+          <p>
+
+            MQ135 Raw Value:
+
+            <strong>
+              {" " +
+                latestMQ135}
+            </strong>
+
+          </p>
+
+
+          <p>
+
+            Location:
+
+            <strong>
+              {" " +
+                sensorLocation}
+            </strong>
+
+          </p>
+
+
+          {sensorTimestamp && (
+
+            <p>
+
+              Last Sensor Update:
+
+              <strong>
+                {" " +
+                  new Date(
+                    sensorTimestamp
+                  ).toLocaleString()}
+              </strong>
+
+            </p>
+
+          )}
 
         </div>
 
@@ -509,34 +703,40 @@ function Dashboard() {
 
 
           <p>
-            Average Temperature:
+
+            Current Temperature:
 
             <strong>
               {" " +
-                averageTemperature +
-                " C"}
+                liveTemperature +
+                " °C"}
             </strong>
+
           </p>
 
 
           <p>
-            Average Humidity:
+
+            Current Humidity:
 
             <strong>
               {" " +
-                averageHumidity +
+                liveHumidity +
                 " %"}
             </strong>
+
           </p>
 
 
           <p>
+
             Latest MQ135 Raw Value:
 
             <strong>
               {" " +
                 latestMQ135}
             </strong>
+
           </p>
 
 
@@ -545,7 +745,9 @@ function Dashboard() {
               color: statusColor
             }}
           >
+
             {environmentStatus}
+
           </h3>
 
         </div>
@@ -570,22 +772,26 @@ function Dashboard() {
 
 
           <p>
+
             Calibration Baseline:
 
             <strong>
               {" " +
                 MQ135_BASELINE}
             </strong>
+
           </p>
 
 
           <p>
+
             Current Raw Value:
 
             <strong>
               {" " +
                 latestMQ135}
             </strong>
+
           </p>
 
 
@@ -594,7 +800,9 @@ function Dashboard() {
               color: mq135Color
             }}
           >
+
             {mq135Status}
+
           </h3>
 
 
@@ -604,9 +812,11 @@ function Dashboard() {
               marginTop: "8px"
             }}
           >
+
             Project-specific monitoring status
             based on the calibrated clean-air
             baseline.
+
           </p>
 
         </div>
@@ -622,16 +832,19 @@ function Dashboard() {
             📍
           </div>
 
+
           <div>
 
             <h2>
               🏭 Warehouse Location
             </h2>
 
+
             <p>
               {WAREHOUSE_LATITUDE},{" "}
               {WAREHOUSE_LONGITUDE}
             </p>
+
 
             <a
               href={warehouseMapsURL}
@@ -669,16 +882,12 @@ function Dashboard() {
         </div>
 
 
-        {/* ===============================
-            GPS TRACKING
-            =============================== */}
+        {/* GPS TRACKING */}
 
         <GPSTracker />
 
 
-        {/* ===============================
-            VEHICLE ENVIRONMENT
-            =============================== */}
+        {/* VEHICLE ENVIRONMENT */}
 
         <VehicleEnvironment />
 
@@ -705,20 +914,21 @@ function Dashboard() {
         </div>
 
 
-        {/* ===============================
-            EXISTING AI QUALITY PREDICTION
-            =============================== */}
+        {/* AI QUALITY PREDICTION */}
 
         <AIPrediction
           pineapples={data}
         />
 
 
-        {/* ===============================
-            AI PRICE PREDICTION
-            =============================== */}
+        {/* AI PRICE PREDICTION */}
 
         <AIPricePrediction />
+
+
+        {/* AI IMAGE QUALITY DETECTION */}
+
+        <ImagePrediction />
 
       </div>
 
