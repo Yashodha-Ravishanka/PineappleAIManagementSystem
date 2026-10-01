@@ -27,4 +27,7 @@ yarn-debug.log*
 .vscode/
 .idea/
 .DS_Store
-Thumbs.db
+Thumbs.dbbackend/ml/models/pineapple_price_model.pkl
+
+backend/ml/models/pineapple_price_model.pkl
+frontend/.expo/

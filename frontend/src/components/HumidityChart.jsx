@@ -1,11 +1,11 @@
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Tooltip,
+    Legend
 } from "chart.js";
 
 import { Line } from "react-chartjs-2";
@@ -13,191 +13,255 @@ import { Line } from "react-chartjs-2";
 import "./HumidityChart.css";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Tooltip,
+    Legend
 );
 
 function HumidityChart({ pineapples }) {
 
-  const readings = pineapples || [];
+    const readings = pineapples || [];
 
-  const chartData = {
+    const chartData = {
 
-    labels: readings.map(item => {
+        labels: readings.map((item) => {
 
-      if (!item.timestamp) {
-        return "";
-      }
+            if (!item.timestamp) {
+                return "";
+            }
 
-      const date = new Date(item.timestamp);
+            const date = new Date(item.timestamp);
 
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
+            return date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
-    }),
+        }),
 
-    datasets: [
+        datasets: [
+            {
+                label: "Humidity (%)",
 
-      {
-        label: "Humidity %",
+                data: readings.map(
+                    (item) => Number(item.humidity || 0)
+                ),
 
-        data: readings.map(
-          item => Number(item.humidity || 0)
-        ),
+                borderWidth: 3,
 
-        borderWidth: 3,
+                tension: 0.4,
 
-        tension: 0.4,
+                pointRadius: 4,
 
-        pointRadius: 4
+                pointHoverRadius: 6,
 
-      }
+                fill: false
+            }
+        ]
 
-    ]
-
-  };
+    };
 
 
-  const options = {
+    const options = {
 
-    responsive: true,
+        responsive: true,
 
-    plugins: {
+        maintainAspectRatio: true,
 
-      legend: {
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
 
-        labels: {
-          color: "white"
-        }
+        plugins: {
 
-      },
+            legend: {
 
-      tooltip: {
+                display: true,
 
-        callbacks: {
+                position: "top",
 
-          title: function(context) {
+                labels: {
 
-            const index = context[0].dataIndex;
+                    color: "white",
 
-            if (
-              readings[index] &&
-              readings[index].timestamp
-            ) {
+                    padding: 15,
 
-              const date =
-                new Date(
-                  readings[index].timestamp
-                );
+                    font: {
+                        size: 13,
+                        weight: "600"
+                    }
 
-              return date.toLocaleString();
+                }
+
+            },
+
+            tooltip: {
+
+                backgroundColor:
+                    "rgba(15, 23, 42, 0.95)",
+
+                titleColor: "#facc15",
+
+                bodyColor: "white",
+
+                padding: 12,
+
+                callbacks: {
+
+                    title: function (context) {
+
+                        const index =
+                            context[0].dataIndex;
+
+                        if (
+                            readings[index] &&
+                            readings[index].timestamp
+                        ) {
+
+                            return new Date(
+                                readings[index].timestamp
+                            ).toLocaleString();
+
+                        }
+
+                        return "Sensor Reading";
+
+                    },
+
+                    label: function (context) {
+
+                        return (
+                            "Humidity: " +
+                            context.parsed.y +
+                            " %"
+                        );
+
+                    }
+
+                }
 
             }
 
-            return "Sensor Reading";
-
-          },
-
-          label: function(context) {
-
-            return (
-              "Humidity: " +
-              context.parsed.y +
-              " %"
-            );
-
-          }
-
-        }
-
-      }
-
-    },
-
-    scales: {
-
-      y: {
-
-        beginAtZero: true,
-
-        ticks: {
-          color: "white"
         },
 
-        title: {
+        scales: {
 
-          display: true,
+            y: {
 
-          text: "Humidity (%)",
+                beginAtZero: true,
 
-          color: "white"
+                ticks: {
+                    color: "rgba(255,255,255,0.75)"
+                },
+
+                grid: {
+                    color: "rgba(255,255,255,0.08)"
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Humidity (%)",
+
+                    color: "rgba(255,255,255,0.85)"
+
+                }
+
+            },
+
+            x: {
+
+                ticks: {
+
+                    color: "rgba(255,255,255,0.75)",
+
+                    maxRotation: 45,
+
+                    minRotation: 0
+
+                },
+
+                grid: {
+                    color: "rgba(255,255,255,0.05)"
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Reading Time",
+
+                    color: "rgba(255,255,255,0.85)"
+
+                }
+
+            }
 
         }
 
-      },
-
-      x: {
-
-        ticks: {
-
-          color: "white",
-
-          maxRotation: 45,
-
-          minRotation: 0
-
-        },
-
-        title: {
-
-          display: true,
-
-          text: "Reading Time",
-
-          color: "white"
-
-        }
-
-      }
-
-    }
-
-  };
+    };
 
 
-  return (
+    return (
 
-    <div className="humidity-chart-container">
+        <div className="humidity-chart-container">
 
-      <h2>
-        Humidity Trend
-      </h2>
+            <div className="chart-header">
 
-      {readings.length > 0 ? (
+                <div>
 
-        <Line
-          data={chartData}
-          options={options}
-        />
+                    <span className="chart-icon">
+                        💧
+                    </span>
 
-      ) : (
+                    <h2>
+                        Humidity Trend
+                    </h2>
 
-        <p>
-          Waiting for humidity data...
-        </p>
+                </div>
 
-      )}
+                <p>
+                    Warehouse humidity monitoring
+                </p>
 
-    </div>
+            </div>
 
-  );
+
+            {readings.length > 0 ? (
+
+                <div className="chart-wrapper">
+
+                    <Line
+                        data={chartData}
+                        options={options}
+                    />
+
+                </div>
+
+            ) : (
+
+                <div className="chart-empty">
+
+                    <span>
+                        💧
+                    </span>
+
+                    <p>
+                        Waiting for humidity data...
+                    </p>
+
+                </div>
+
+            )}
+
+        </div>
+
+    );
 
 }
 

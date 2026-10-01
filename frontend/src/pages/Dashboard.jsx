@@ -1,11 +1,13 @@
 
 import { useEffect, useState } from "react";
 
+import VehicleEnvironment from "../components/VehicleEnvironment";
 import PineappleTable from "../components/PineappleTable";
 import QualityChart from "../components/QualityChart";
 import ReportExport from "../components/ReportExport";
 import StatusCard from "../components/StatusCard";
 import AIPrediction from "../components/AIPrediction";
+import AIPricePrediction from "../components/AIPricePrediction";
 import RiskChart from "../components/RiskChart";
 import TemperatureChart from "../components/TemperatureChart";
 import HumidityChart from "../components/HumidityChart";
@@ -344,6 +346,18 @@ function Dashboard() {
 
 
   // ===============================
+  // FIXED WAREHOUSE LOCATION
+  // ===============================
+
+  const WAREHOUSE_LATITUDE = 7.243556;
+
+  const WAREHOUSE_LONGITUDE = 80.022711;
+
+  const warehouseMapsURL =
+    `https://www.google.com/maps?q=${WAREHOUSE_LATITUDE},${WAREHOUSE_LONGITUDE}`;
+
+
+  // ===============================
   // DASHBOARD UI
   // ===============================
 
@@ -356,311 +370,453 @@ function Dashboard() {
           DASHBOARD TITLE
           =============================== */}
 
-      <h1>
-        Pineapple AI Dashboard
-      </h1>
+      <div className="dashboard-header">
 
-
-      {/* ===============================
-          STATUS CARDS
-          =============================== */}
-
-      <div className="status-container">
-
-        <StatusCard
-          title="Sensor Readings"
-          value={totalReadings}
-        />
-
-
-        <StatusCard
-          title="Active Batches"
-          value={activeBatches}
-        />
-
-
-        <StatusCard
-          title="Good"
-          value={goodCount}
-        />
-
-
-        <StatusCard
-          title="Average"
-          value={averageCount}
-        />
-
-
-        <StatusCard
-          title="Bad"
-          value={badCount}
-        />
-
-
-        <StatusCard
-          title="High Risk"
-          value={highRiskCount}
-        />
-
-
-        <StatusCard
-          title="Medium Risk"
-          value={mediumRiskCount}
-        />
-
-
-        <StatusCard
-          title="Low Risk"
-          value={lowRiskCount}
-        />
-
-
-        <StatusCard
-          title="Avg Temperature"
-          value={
-            String(
-              averageTemperature
-            ) + " C"
-          }
-        />
-
-
-        <StatusCard
-          title="Avg Humidity"
-          value={
-            String(
-              averageHumidity
-            ) + " %"
-          }
-        />
-
-
-        <StatusCard
-          title="MQ135 Raw Value"
-          value={latestMQ135}
-        />
-
-      </div>
-
-
-      {/* ===============================
-          ENVIRONMENT STATUS
-          =============================== */}
-
-      <div
-        className="environment-card"
-        style={{
-          borderLeft:
-            "8px solid " +
-            statusColor
-        }}
-      >
-
-        <h2>
-          Environment Status
-        </h2>
-
+        <h1>
+          🍍 Pineapple AI Dashboard
+        </h1>
 
         <p>
-
-          Average Temperature:
-
-          <strong>
-
-            {" " +
-              averageTemperature +
-              " C"}
-
-          </strong>
-
-        </p>
-
-
-        <p>
-
-          Average Humidity:
-
-          <strong>
-
-            {" " +
-              averageHumidity +
-              " %"}
-
-          </strong>
-
-        </p>
-
-
-        <p>
-
-          Latest MQ135 Raw Value:
-
-          <strong>
-
-            {" " +
-              latestMQ135}
-
-          </strong>
-
-        </p>
-
-
-        <h3
-          style={{
-            color: statusColor
-          }}
-        >
-
-          {environmentStatus}
-
-        </h3>
-
-      </div>
-
-
-      {/* ===============================
-          MQ135 AIR QUALITY STATUS
-          =============================== */}
-
-      <div
-        className="environment-card"
-        style={{
-          borderLeft:
-            "8px solid " +
-            mq135Color
-        }}
-      >
-
-        <h2>
-          🫁 MQ135 Air Quality
-        </h2>
-
-
-        <p>
-
-          Calibration Baseline:
-
-          <strong>
-
-            {" " +
-              MQ135_BASELINE}
-
-          </strong>
-
-        </p>
-
-
-        <p>
-
-          Current Raw Value:
-
-          <strong>
-
-            {" " +
-              latestMQ135}
-
-          </strong>
-
-        </p>
-
-
-        <h3
-          style={{
-            color: mq135Color
-          }}
-        >
-
-          {mq135Status}
-
-        </h3>
-
-
-        <p
-          style={{
-            fontSize: "14px",
-            marginTop: "8px"
-          }}
-        >
-
-          Project-specific monitoring status
-          based on the calibrated clean-air
-          baseline.
-
+          Smart warehouse and vehicle
+          quality monitoring system
         </p>
 
       </div>
 
 
       {/* ===============================
-          GPS TRACKING
+          WAREHOUSE MONITORING
           =============================== */}
 
-      <GPSTracker
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            🏭 Warehouse Monitoring
+          </h2>
+
+          <p>
+            Pineapple quality and warehouse
+            environmental conditions
+          </p>
+
+        </div>
+
+
+        {/* ===============================
+            STATUS CARDS
+            =============================== */}
+
+        <div className="status-container">
+
+          <StatusCard
+            title="Sensor Readings"
+            value={totalReadings}
+            type="total"
+            icon="📡"
+          />
+
+          <StatusCard
+            title="Active Batches"
+            value={activeBatches}
+            type="total"
+            icon="🍍"
+          />
+
+          <StatusCard
+            title="Good"
+            value={goodCount}
+            type="good"
+            icon="✅"
+          />
+
+          <StatusCard
+            title="Average"
+            value={averageCount}
+            type="warning"
+            icon="⚠️"
+          />
+
+          <StatusCard
+            title="Bad"
+            value={badCount}
+            type="bad"
+            icon="❌"
+          />
+
+          <StatusCard
+            title="High Risk"
+            value={highRiskCount}
+            type="high-risk"
+            icon="🔴"
+          />
+
+          <StatusCard
+            title="Medium Risk"
+            value={mediumRiskCount}
+            type="medium-risk"
+            icon="🟠"
+          />
+
+          <StatusCard
+            title="Low Risk"
+            value={lowRiskCount}
+            type="low-risk"
+            icon="🟢"
+          />
+
+          <StatusCard
+            title="Avg Temperature"
+            value={`${averageTemperature} °C`}
+            type="temperature"
+            icon="🌡️"
+          />
+
+          <StatusCard
+            title="Avg Humidity"
+            value={`${averageHumidity} %`}
+            type="humidity"
+            icon="💧"
+          />
+
+          <StatusCard
+            title="MQ135 Raw Value"
+            value={latestMQ135}
+            type="air"
+            icon="🌫️"
+          />
+
+        </div>
+
+
+        {/* ===============================
+            ENVIRONMENT STATUS
+            =============================== */}
+
+        <div
+          className="environment-card"
+          style={{
+            borderLeft:
+              "8px solid " +
+              statusColor
+          }}
+        >
+
+          <h2>
+            🌡️ Warehouse Environment Status
+          </h2>
+
+
+          <p>
+            Average Temperature:
+
+            <strong>
+              {" " +
+                averageTemperature +
+                " C"}
+            </strong>
+          </p>
+
+
+          <p>
+            Average Humidity:
+
+            <strong>
+              {" " +
+                averageHumidity +
+                " %"}
+            </strong>
+          </p>
+
+
+          <p>
+            Latest MQ135 Raw Value:
+
+            <strong>
+              {" " +
+                latestMQ135}
+            </strong>
+          </p>
+
+
+          <h3
+            style={{
+              color: statusColor
+            }}
+          >
+            {environmentStatus}
+          </h3>
+
+        </div>
+
+
+        {/* ===============================
+            MQ135 AIR QUALITY STATUS
+            =============================== */}
+
+        <div
+          className="environment-card"
+          style={{
+            borderLeft:
+              "8px solid " +
+              mq135Color
+          }}
+        >
+
+          <h2>
+            🫁 MQ135 Air Quality
+          </h2>
+
+
+          <p>
+            Calibration Baseline:
+
+            <strong>
+              {" " +
+                MQ135_BASELINE}
+            </strong>
+          </p>
+
+
+          <p>
+            Current Raw Value:
+
+            <strong>
+              {" " +
+                latestMQ135}
+            </strong>
+          </p>
+
+
+          <h3
+            style={{
+              color: mq135Color
+            }}
+          >
+            {mq135Status}
+          </h3>
+
+
+          <p
+            style={{
+              fontSize: "14px",
+              marginTop: "8px"
+            }}
+          >
+            Project-specific monitoring status
+            based on the calibrated clean-air
+            baseline.
+          </p>
+
+        </div>
+
+
+        {/* ===============================
+            WAREHOUSE LOCATION
+            =============================== */}
+
+        <div className="warehouse-location-dashboard">
+
+          <div className="warehouse-location-icon">
+            📍
+          </div>
+
+          <div>
+
+            <h2>
+              🏭 Warehouse Location
+            </h2>
+
+            <p>
+              {WAREHOUSE_LATITUDE},{" "}
+              {WAREHOUSE_LONGITUDE}
+            </p>
+
+            <a
+              href={warehouseMapsURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="warehouse-map-link"
+            >
+              Open in Google Maps →
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
 
 
       {/* ===============================
-          AI PREDICTION
+          VEHICLE MONITORING
           =============================== */}
 
-      <AIPrediction
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            🚚 Vehicle & Location Monitoring
+          </h2>
+
+          <p>
+            Live vehicle position and
+            transportation environment
+          </p>
+
+        </div>
+
+
+        {/* ===============================
+            GPS TRACKING
+            =============================== */}
+
+        <GPSTracker />
+
+
+        {/* ===============================
+            VEHICLE ENVIRONMENT
+            =============================== */}
+
+        <VehicleEnvironment />
+
+      </div>
 
 
       {/* ===============================
-          QUALITY CHART
+          AI QUALITY MONITORING
           =============================== */}
 
-      <QualityChart
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            🤖 AI Quality Monitoring
+          </h2>
+
+          <p>
+            AI-based pineapple quality
+            prediction and risk analysis
+          </p>
+
+        </div>
+
+
+        {/* ===============================
+            EXISTING AI QUALITY PREDICTION
+            =============================== */}
+
+        <AIPrediction
+          pineapples={data}
+        />
+
+
+        {/* ===============================
+            AI PRICE PREDICTION
+            =============================== */}
+
+        <AIPricePrediction />
+
+      </div>
 
 
       {/* ===============================
-          RISK CHART
+          ANALYTICS
           =============================== */}
 
-      <RiskChart
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            📊 Analytics
+          </h2>
+
+          <p>
+            Quality, risk and environmental
+            monitoring trends
+          </p>
+
+        </div>
+
+
+        <QualityChart
+          pineapples={data}
+        />
+
+
+        <RiskChart
+          pineapples={data}
+        />
+
+
+        <TemperatureChart
+          pineapples={data}
+        />
+
+
+        <HumidityChart
+          pineapples={data}
+        />
+
+      </div>
 
 
       {/* ===============================
-          TEMPERATURE CHART
+          PINEAPPLE BATCH DATA
           =============================== */}
 
-      <TemperatureChart
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            🍍 Pineapple Batch Data
+          </h2>
+
+          <p>
+            Current pineapple monitoring
+            records
+          </p>
+
+        </div>
+
+
+        <PineappleTable
+          pineapples={data}
+        />
+
+      </div>
 
 
       {/* ===============================
-          HUMIDITY CHART
+          REPORTS
           =============================== */}
 
-      <HumidityChart
-        pineapples={data}
-      />
+      <div className="dashboard-section">
+
+        <div className="section-title">
+
+          <h2>
+            📄 Reports
+          </h2>
+
+          <p>
+            Export pineapple monitoring data
+          </p>
+
+        </div>
 
 
-      {/* ===============================
-          PINEAPPLE TABLE
-          =============================== */}
+        <ReportExport
+          pineapples={data}
+        />
 
-      <PineappleTable
-        pineapples={data}
-      />
+      </div>
 
-
-      {/* ===============================
-          REPORT EXPORT
-          =============================== */}
-
-      <ReportExport
-        pineapples={data}
-      />
 
     </div>
 

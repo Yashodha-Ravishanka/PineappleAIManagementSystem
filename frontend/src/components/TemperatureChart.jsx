@@ -1,11 +1,11 @@
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Tooltip,
+    Legend
 } from "chart.js";
 
 import { Line } from "react-chartjs-2";
@@ -13,191 +13,250 @@ import { Line } from "react-chartjs-2";
 import "./TemperatureChart.css";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Tooltip,
+    Legend
 );
 
 function TemperatureChart({ pineapples }) {
 
-  const readings = pineapples || [];
+    const readings = pineapples || [];
 
-  const chartData = {
+    const chartData = {
 
-    labels: readings.map(item => {
+        labels: readings.map((item) => {
 
-      if (!item.timestamp) {
-        return "";
-      }
+            if (!item.timestamp) {
+                return "";
+            }
 
-      const date = new Date(item.timestamp);
+            const date = new Date(item.timestamp);
 
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
+            return date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
-    }),
+        }),
 
-    datasets: [
+        datasets: [
+            {
+                label: "Temperature (°C)",
 
-      {
-        label: "Temperature C",
+                data: readings.map(
+                    (item) => Number(item.temperature || 0)
+                ),
 
-        data: readings.map(
-          item => Number(item.temperature || 0)
-        ),
+                borderWidth: 3,
 
-        borderWidth: 3,
+                tension: 0.4,
 
-        tension: 0.4,
+                pointRadius: 4,
 
-        pointRadius: 4
+                pointHoverRadius: 6,
 
-      }
+                fill: false
+            }
+        ]
 
-    ]
-
-  };
+    };
 
 
-  const options = {
+    const options = {
 
-    responsive: true,
+        responsive: true,
 
-    plugins: {
+        maintainAspectRatio: true,
 
-      legend: {
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
 
-        labels: {
-          color: "white"
-        }
+        plugins: {
 
-      },
+            legend: {
 
-      tooltip: {
+                display: true,
 
-        callbacks: {
+                position: "top",
 
-          title: function(context) {
+                labels: {
+                    color: "white",
+                    padding: 15,
+                    font: {
+                        size: 13,
+                        weight: "600"
+                    }
+                }
 
-            const index = context[0].dataIndex;
+            },
 
-            if (
-              readings[index] &&
-              readings[index].timestamp
-            ) {
+            tooltip: {
 
-              const date =
-                new Date(
-                  readings[index].timestamp
-                );
+                backgroundColor: "rgba(15, 23, 42, 0.95)",
 
-              return date.toLocaleString();
+                titleColor: "#facc15",
+
+                bodyColor: "white",
+
+                padding: 12,
+
+                callbacks: {
+
+                    title: function (context) {
+
+                        const index =
+                            context[0].dataIndex;
+
+                        if (
+                            readings[index] &&
+                            readings[index].timestamp
+                        ) {
+
+                            return new Date(
+                                readings[index].timestamp
+                            ).toLocaleString();
+
+                        }
+
+                        return "Sensor Reading";
+
+                    },
+
+                    label: function (context) {
+
+                        return (
+                            "Temperature: " +
+                            context.parsed.y +
+                            " °C"
+                        );
+
+                    }
+
+                }
 
             }
 
-            return "Sensor Reading";
-
-          },
-
-          label: function(context) {
-
-            return (
-              "Temperature: " +
-              context.parsed.y +
-              " C"
-            );
-
-          }
-
-        }
-
-      }
-
-    },
-
-    scales: {
-
-      y: {
-
-        beginAtZero: true,
-
-        ticks: {
-          color: "white"
         },
 
-        title: {
+        scales: {
 
-          display: true,
+            y: {
 
-          text: "Temperature (C)",
+                beginAtZero: false,
 
-          color: "white"
+                ticks: {
+                    color: "rgba(255,255,255,0.75)"
+                },
+
+                grid: {
+                    color: "rgba(255,255,255,0.08)"
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Temperature (°C)",
+
+                    color: "rgba(255,255,255,0.85)"
+
+                }
+
+            },
+
+            x: {
+
+                ticks: {
+
+                    color: "rgba(255,255,255,0.75)",
+
+                    maxRotation: 45,
+
+                    minRotation: 0
+
+                },
+
+                grid: {
+                    color: "rgba(255,255,255,0.05)"
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Reading Time",
+
+                    color: "rgba(255,255,255,0.85)"
+
+                }
+
+            }
 
         }
 
-      },
-
-      x: {
-
-        ticks: {
-
-          color: "white",
-
-          maxRotation: 45,
-
-          minRotation: 0
-
-        },
-
-        title: {
-
-          display: true,
-
-          text: "Reading Time",
-
-          color: "white"
-
-        }
-
-      }
-
-    }
-
-  };
+    };
 
 
-  return (
+    return (
 
-    <div className="temperature-chart-container">
+        <div className="temperature-chart-container">
 
-      <h2>
-        Temperature Trend
-      </h2>
+            <div className="chart-header">
 
-      {readings.length > 0 ? (
+                <div>
 
-        <Line
-          data={chartData}
-          options={options}
-        />
+                    <span className="chart-icon">
+                        🌡️
+                    </span>
 
-      ) : (
+                    <h2>
+                        Temperature Trend
+                    </h2>
 
-        <p>
-          Waiting for temperature data...
-        </p>
+                </div>
 
-      )}
+                <p>
+                    Warehouse temperature monitoring
+                </p>
 
-    </div>
+            </div>
 
-  );
+
+            {readings.length > 0 ? (
+
+                <div className="chart-wrapper">
+
+                    <Line
+                        data={chartData}
+                        options={options}
+                    />
+
+                </div>
+
+            ) : (
+
+                <div className="chart-empty">
+
+                    <span>
+                        🌡️
+                    </span>
+
+                    <p>
+                        Waiting for temperature data...
+                    </p>
+
+                </div>
+
+            )}
+
+        </div>
+
+    );
 
 }
 

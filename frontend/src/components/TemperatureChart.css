@@ -1,24 +1,196 @@
-.temperature-chart{
+/* =========================================================
+   TEMPERATURE CHART
+   ========================================================= */
 
-background:rgba(255,255,255,0.08);
+.temperature-chart-container {
 
-padding:25px;
+    width: 100%;
 
-margin:20px;
+    box-sizing: border-box;
 
-border-radius:20px;
+    margin: 25px 0;
 
-backdrop-filter:blur(10px);
+    padding: 28px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.temperature-chart-container:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.28);
 
 }
 
 
-.temperature-chart h2{
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-color:white;
+.chart-header {
 
-text-align:center;
+    margin-bottom: 25px;
 
-margin-bottom:20px;
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+}
+
+
+.chart-header > div {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.chart-icon {
+
+    font-size: 28px;
+
+}
+
+
+.chart-header h2 {
+
+    margin: 0;
+
+    color: #facc15;
+
+    font-size: 23px;
+
+    font-weight: 750;
+
+}
+
+
+.chart-header p {
+
+    margin: 7px 0 0;
+
+    color: rgba(255, 255, 255, 0.60);
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.chart-wrapper {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 300px;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.chart-empty {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 250px;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    text-align: center;
+
+}
+
+
+.chart-empty span {
+
+    font-size: 45px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.chart-empty p {
+
+    margin: 0;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .temperature-chart-container {
+
+        padding: 20px;
+
+        margin: 20px 0;
+
+    }
+
+
+    .chart-header h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .chart-icon {
+
+        font-size: 24px;
+
+    }
+
+
+    .chart-wrapper {
+
+        min-height: 240px;
+
+    }
 
 }

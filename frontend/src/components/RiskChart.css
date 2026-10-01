@@ -1,24 +1,198 @@
-.risk-chart-container{
+/* =========================================================
+   RISK CHART
+   ========================================================= */
 
-background:rgba(255,255,255,0.08);
+.risk-chart-container {
 
-padding:25px;
+    width: 100%;
 
-border-radius:20px;
+    box-sizing: border-box;
 
-margin:20px;
+    margin: 25px 0;
 
-backdrop-filter:blur(10px);
+    padding: 28px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.risk-chart-container:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.28);
 
 }
 
 
-.risk-chart-container h2{
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-color:white;
+.risk-chart-header {
 
-text-align:center;
+    margin-bottom: 25px;
 
-margin-bottom:20px;
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+}
+
+
+.risk-chart-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.risk-chart-icon {
+
+    font-size: 28px;
+
+}
+
+
+.risk-chart-title h2 {
+
+    margin: 0;
+
+    color: #facc15;
+
+    font-size: 23px;
+
+    font-weight: 750;
+
+}
+
+
+.risk-chart-header p {
+
+    margin: 7px 0 0;
+
+    color:
+        rgba(255, 255, 255, 0.60);
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.risk-chart-wrapper {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 300px;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.risk-chart-empty {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 250px;
+
+    color:
+        rgba(255, 255, 255, 0.65);
+
+    text-align: center;
+
+}
+
+
+.risk-chart-empty span {
+
+    font-size: 45px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.risk-chart-empty p {
+
+    margin: 0;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .risk-chart-container {
+
+        padding: 20px;
+
+        margin: 20px 0;
+
+    }
+
+
+    .risk-chart-title h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .risk-chart-icon {
+
+        font-size: 24px;
+
+    }
+
+
+    .risk-chart-wrapper {
+
+        min-height: 240px;
+
+    }
 
 }

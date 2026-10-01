@@ -1,214 +1,222 @@
 import { useEffect, useState } from "react";
+import { getVehicleGPS } from "../services/api";
+import "./GPSTracker.css";
 
-function GPSTracker({ pineapples }) {
+function GPSTracker() {
+    const [vehicleGPS, setVehicleGPS] = useState(null);
+    const [gpsLoading, setGpsLoading] = useState(true);
 
-  const [latestLocation, setLatestLocation] = useState(null);
+    const loadVehicleGPS = async () => {
+        try {
+            const data = await getVehicleGPS();
 
-  useEffect(() => {
+            if (data && data.length > 0) {
+                const latest = data.reduce((latest, current) => {
+                    return new Date(current.timestamp) >
+                        new Date(latest.timestamp)
+                        ? current
+                        : latest;
+                });
 
-    if (!pineapples || pineapples.length === 0) {
-
-      setLatestLocation(null);
-
-      return;
-    }
-
-    const latestBatch = [...pineapples].sort(
-  (a, b) =>
-    new Date(b.timestamp) -
-    new Date(a.timestamp)
-)[0];
-
-    if (!latestBatch.location) {
-
-      setLatestLocation(null);
-
-      return;
-    }
-
-    const parts =
-      latestBatch.location.split(",");
-
-    if (parts.length >= 2) {
-
-      const latitude =
-        Number(parts[0].trim());
-
-      const longitude =
-        Number(parts[1].trim());
-
-      if (
-        !isNaN(latitude) &&
-        !isNaN(longitude)
-      ) {
-
-        setLatestLocation({
-
-          latitude,
-          longitude,
-
-          batchId:
-            latestBatch.batchId,
-
-        });
-
-      }
-
-    }
-
-  }, [pineapples]);
-
-
-  // ===============================
-  // GPS STATUS
-  // ===============================
-
-  const gpsStatus =
-    latestLocation
-      ? "GPS Active"
-      : "GPS Unavailable";
-
-
-  const gpsColor =
-    latestLocation
-      ? "#16a34a"
-      : "#dc2626";
-
-
-  return (
-
-    <div
-      className="environment-card"
-      style={{
-        borderLeft:
-          "8px solid " +
-          gpsColor
-      }}
-    >
-
-      <h2>
-        📍 GPS Location
-      </h2>
-
-
-      {latestLocation ? (
-
-        <>
-
-          <p>
-
-            GPS Status:
-
-            <strong
-              style={{
-                color: gpsColor,
-                marginLeft: "8px"
-              }}
-            >
-
-              {gpsStatus}
-
-            </strong>
-
-          </p>
-
-
-          <p>
-
-            Batch ID:
-
-            <strong>
-
-              {" " +
-                latestLocation.batchId}
-
-            </strong>
-
-          </p>
-
-
-          <p>
-
-            Latitude:
-
-            <strong>
-
-              {" " +
-                latestLocation.latitude.toFixed(6)}
-
-            </strong>
-
-          </p>
-
-
-          <p>
-
-            Longitude:
-
-            <strong>
-
-              {" " +
-                latestLocation.longitude.toFixed(6)}
-
-            </strong>
-
-          </p>
-
-
-          <a
-            href={
-              `https://www.google.com/maps?q=` +
-              `${latestLocation.latitude},` +
-              `${latestLocation.longitude}`
+                setVehicleGPS(latest);
+            } else {
+                setVehicleGPS(null);
             }
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-block",
-              marginTop: "10px"
-            }}
-          >
+        } catch (error) {
+            console.error("Vehicle GPS error:", error);
+            setVehicleGPS(null);
+        } finally {
+            setGpsLoading(false);
+        }
+    };
 
-            🗺️ Open Location in Google Maps
+    useEffect(() => {
+        loadVehicleGPS();
 
-          </a>
+        const interval = setInterval(
+            loadVehicleGPS,
+            5000
+        );
 
-        </>
+        return () => clearInterval(interval);
+    }, []);
 
-      ) : (
+    const getGoogleMapsURL = () => {
+        if (!vehicleGPS) {
+            return "#";
+        }
 
-        <>
+        return `https://www.google.com/maps?q=${vehicleGPS.latitude},${vehicleGPS.longitude}`;
+    };
 
-          <p>
+    return (
+        <div className="gps-tracker-container">
 
-            GPS Status:
+            {/* =====================================
+                VEHICLE GPS ONLY
+                ===================================== */}
 
-            <strong
-              style={{
-                color: gpsColor,
-                marginLeft: "8px"
-              }}
-            >
+            <div className="vehicle-gps-card">
 
-              GPS Unavailable
+                <div className="gps-header">
 
-            </strong>
+                    <h2>🚚 Vehicle GPS</h2>
 
-          </p>
+                    <span className="vehicle-qr">
+                        VEHICLE001
+                    </span>
+
+                </div>
 
 
-          <p>
-            Waiting for GPS location...
-          </p>
+                {/* GPS STATUS */}
 
-        </>
+                <div className="gps-status">
 
-      )}
+                    <span
+                        className={
+                            vehicleGPS
+                                ? "status-dot active"
+                                : "status-dot inactive"
+                        }
+                    ></span>
 
-    </div>
+                    <strong>
+                        GPS Status:
+                    </strong>
 
-  );
+                    <span>
+                        {gpsLoading
+                            ? "Checking..."
+                            : vehicleGPS
+                                ? "GPS Active"
+                                : "GPS Unavailable"}
+                    </span>
 
+                </div>
+
+
+                {/* GPS DATA */}
+
+                {vehicleGPS ? (
+
+                    <>
+
+                        <div className="gps-data-grid">
+
+                            <div className="gps-data-card">
+
+                                <span className="gps-icon">
+                                    🌐
+                                </span>
+
+                                <h3>
+                                    Latitude
+                                </h3>
+
+                                <p>
+                                    {Number(
+                                        vehicleGPS.latitude
+                                    ).toFixed(6)}
+                                </p>
+
+                            </div>
+
+
+                            <div className="gps-data-card">
+
+                                <span className="gps-icon">
+                                    🌐
+                                </span>
+
+                                <h3>
+                                    Longitude
+                                </h3>
+
+                                <p>
+                                    {Number(
+                                        vehicleGPS.longitude
+                                    ).toFixed(6)}
+                                </p>
+
+                            </div>
+
+
+                            <div className="gps-data-card">
+
+                                <span className="gps-icon">
+                                    🚗
+                                </span>
+
+                                <h3>
+                                    Speed
+                                </h3>
+
+                                <p>
+                                    {Number(
+                                        vehicleGPS.speed || 0
+                                    ).toFixed(2)}{" "}
+                                    km/h
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* GOOGLE MAPS */}
+
+                        <a
+                            href={getGoogleMapsURL()}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="google-maps-button"
+                        >
+                            📍 Open Vehicle Location in Google Maps
+                        </a>
+
+
+                        {/* LAST UPDATE */}
+
+                        <div className="gps-last-update">
+
+                            Last update:{" "}
+
+                            {vehicleGPS.timestamp
+                                ? new Date(
+                                      vehicleGPS.timestamp
+                                  ).toLocaleString()
+                                : "--"}
+
+                        </div>
+
+                    </>
+
+                ) : (
+
+                    <div className="gps-waiting">
+
+                        <div className="waiting-icon">
+                            📡
+                        </div>
+
+                        <p>
+                            Waiting for vehicle GPS data...
+                        </p>
+
+                        <small>
+                            Make sure the NEO-6M has a
+                            satellite fix.
+                        </small>
+
+                    </div>
+
+                )}
+
+            </div>
+
+        </div>
+    );
 }
 
 export default GPSTracker;

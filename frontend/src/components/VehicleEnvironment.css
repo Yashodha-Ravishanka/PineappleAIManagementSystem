@@ -1,0 +1,86 @@
+.vehicle-environment {
+    margin: 25px 0;
+    padding: 25px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+}
+
+.vehicle-environment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.vehicle-environment-header h2 {
+    margin: 0;
+}
+
+.vehicle-id {
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: rgba(250, 204, 21, 0.15);
+    color: #facc15;
+    font-weight: 600;
+}
+
+.vehicle-sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.vehicle-sensor-card {
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    text-align: center;
+}
+
+.sensor-icon {
+    font-size: 30px;
+}
+
+.vehicle-sensor-card h3 {
+    margin: 10px 0 8px;
+    font-size: 15px;
+}
+
+.vehicle-sensor-card p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #facc15;
+}
+
+.vehicle-waiting {
+    text-align: center;
+    padding: 30px;
+    opacity: 0.7;
+}
+
+.vehicle-last-update {
+    margin-top: 18px;
+    font-size: 13px;
+    opacity: 0.65;
+}
+
+@media (max-width: 900px) {
+    .vehicle-sensor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .vehicle-sensor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-environment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

@@ -1,24 +1,196 @@
-.humidity-chart{
+/* =========================================================
+   HUMIDITY CHART
+   ========================================================= */
 
-background:rgba(255,255,255,0.08);
+.humidity-chart-container {
 
-padding:25px;
+    width: 100%;
 
-margin:20px;
+    box-sizing: border-box;
 
-border-radius:20px;
+    margin: 25px 0;
 
-backdrop-filter:blur(10px);
+    padding: 28px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.humidity-chart-container:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.28);
 
 }
 
 
-.humidity-chart h2{
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-color:white;
+.humidity-chart-container .chart-header {
 
-text-align:center;
+    margin-bottom: 25px;
 
-margin-bottom:20px;
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+
+}
+
+
+.humidity-chart-container .chart-header > div {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.humidity-chart-container .chart-icon {
+
+    font-size: 28px;
+
+}
+
+
+.humidity-chart-container .chart-header h2 {
+
+    margin: 0;
+
+    color: #facc15;
+
+    font-size: 23px;
+
+    font-weight: 750;
+
+}
+
+
+.humidity-chart-container .chart-header p {
+
+    margin: 7px 0 0;
+
+    color: rgba(255, 255, 255, 0.60);
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.humidity-chart-container .chart-wrapper {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 300px;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.humidity-chart-container .chart-empty {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 250px;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    text-align: center;
+
+}
+
+
+.humidity-chart-container .chart-empty span {
+
+    font-size: 45px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.humidity-chart-container .chart-empty p {
+
+    margin: 0;
+
+    font-size: 15px;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .humidity-chart-container {
+
+        padding: 20px;
+
+        margin: 20px 0;
+
+    }
+
+
+    .humidity-chart-container .chart-header h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .humidity-chart-container .chart-icon {
+
+        font-size: 24px;
+
+    }
+
+
+    .humidity-chart-container .chart-wrapper {
+
+        min-height: 240px;
+
+    }
 
 }

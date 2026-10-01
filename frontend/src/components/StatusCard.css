@@ -1,94 +1,341 @@
+/* =========================================================
+   STATUS CARD
+   ========================================================= */
+
 .status-card {
 
-  display: flex;
-  align-items: center;
-  gap: 18px;
+    display: flex;
 
-  padding: 22px;
+    align-items: center;
 
-  border-radius: 20px;
+    gap: 18px;
 
-  background: rgba(255,255,255,0.08);
+    min-height: 105px;
 
-  backdrop-filter: blur(10px);
+    padding: 22px;
 
-  color: white;
+    box-sizing: border-box;
 
-  border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
 
-  transition: 0.3s;
+    background: rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.18);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
 
 }
 
+
+/* =========================================================
+   HOVER
+   ========================================================= */
 
 .status-card:hover {
 
-  transform: translateY(-6px);
+    transform: translateY(-6px);
+
+    box-shadow:
+        0 15px 30px rgba(0, 0, 0, 0.28);
 
 }
 
 
+/* =========================================================
+   ICON
+   ========================================================= */
+
 .card-icon {
 
-  font-size: 40px;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 55px;
+
+    height: 55px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    font-size: 32px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.card-content {
+
+    min-width: 0;
 
 }
 
 
 .card-content h3 {
 
-  margin: 0;
+    margin: 0;
 
-  font-size: 16px;
+    font-size: 16px;
 
-  opacity: 0.8;
+    font-weight: 600;
+
+    opacity: 0.8;
 
 }
 
 
 .card-content p {
 
-  margin-top: 8px;
+    margin: 8px 0 0;
 
-  font-size: 28px;
+    font-size: 28px;
 
-  font-weight: bold;
+    font-weight: 800;
 
-}
+    line-height: 1.1;
 
-
-/* Card types */
-
-.status-card.temperature {
-
-  border-left: 5px solid #ef4444;
+    word-break: break-word;
 
 }
 
 
-.status-card.humidity {
-
-  border-left: 5px solid #38bdf8;
-
-}
-
-
-.status-card.good {
-
-  border-left: 5px solid #22c55e;
-
-}
-
-
-.status-card.bad {
-
-  border-left: 5px solid #f97316;
-
-}
-
+/* =========================================================
+   TOTAL / DEFAULT
+   ========================================================= */
 
 .status-card.total {
 
-  border-left: 5px solid #a855f7;
+    border-left: 5px solid #a855f7;
+
+}
+
+
+.status-card.total .card-icon {
+
+    background: rgba(168, 85, 247, 0.15);
+
+}
+
+
+/* =========================================================
+   TEMPERATURE
+   ========================================================= */
+
+.status-card.temperature {
+
+    border-left: 5px solid #ef4444;
+
+}
+
+
+.status-card.temperature .card-icon {
+
+    background: rgba(239, 68, 68, 0.15);
+
+}
+
+
+/* =========================================================
+   HUMIDITY
+   ========================================================= */
+
+.status-card.humidity {
+
+    border-left: 5px solid #38bdf8;
+
+}
+
+
+.status-card.humidity .card-icon {
+
+    background: rgba(56, 189, 248, 0.15);
+
+}
+
+
+/* =========================================================
+   GOOD
+   ========================================================= */
+
+.status-card.good {
+
+    border-left: 5px solid #22c55e;
+
+}
+
+
+.status-card.good .card-icon {
+
+    background: rgba(34, 197, 94, 0.15);
+
+}
+
+
+/* =========================================================
+   BAD
+   ========================================================= */
+
+.status-card.bad {
+
+    border-left: 5px solid #f97316;
+
+}
+
+
+.status-card.bad .card-icon {
+
+    background: rgba(249, 115, 22, 0.15);
+
+}
+
+
+/* =========================================================
+   WARNING
+   ========================================================= */
+
+.status-card.warning {
+
+    border-left: 5px solid #facc15;
+
+}
+
+
+.status-card.warning .card-icon {
+
+    background: rgba(250, 204, 21, 0.15);
+
+}
+
+
+/* =========================================================
+   HIGH RISK
+   ========================================================= */
+
+.status-card.high-risk {
+
+    border-left: 5px solid #ef4444;
+
+}
+
+
+.status-card.high-risk .card-icon {
+
+    background: rgba(239, 68, 68, 0.15);
+
+}
+
+
+/* =========================================================
+   MEDIUM RISK
+   ========================================================= */
+
+.status-card.medium-risk {
+
+    border-left: 5px solid #f97316;
+
+}
+
+
+.status-card.medium-risk .card-icon {
+
+    background: rgba(249, 115, 22, 0.15);
+
+}
+
+
+/* =========================================================
+   LOW RISK
+   ========================================================= */
+
+.status-card.low-risk {
+
+    border-left: 5px solid #22c55e;
+
+}
+
+
+.status-card.low-risk .card-icon {
+
+    background: rgba(34, 197, 94, 0.15);
+
+}
+
+
+/* =========================================================
+   AIR QUALITY
+   ========================================================= */
+
+.status-card.air {
+
+    border-left: 5px solid #a855f7;
+
+}
+
+
+.status-card.air .card-icon {
+
+    background: rgba(168, 85, 247, 0.15);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .status-card {
+
+        min-height: 90px;
+
+        padding: 17px;
+
+        gap: 14px;
+
+    }
+
+
+    .card-icon {
+
+        width: 46px;
+
+        height: 46px;
+
+        font-size: 25px;
+
+    }
+
+
+    .card-content h3 {
+
+        font-size: 14px;
+
+    }
+
+
+    .card-content p {
+
+        font-size: 24px;
+
+    }
 
 }

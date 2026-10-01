@@ -1,10 +1,10 @@
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-  Legend
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Tooltip,
+    Legend
 } from "chart.js";
 
 import { Bar } from "react-chartjs-2";
@@ -13,231 +13,244 @@ import "./RiskChart.css";
 
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Tooltip,
+    Legend
 );
-
 
 
 function RiskChart({ pineapples }) {
 
-
-  const low = pineapples.filter(
-    (item) =>
-      item.riskLevel?.toLowerCase() === "low"
-  ).length;
+    const readings = pineapples || [];
 
 
-
-  const medium = pineapples.filter(
-    (item) =>
-      item.riskLevel?.toLowerCase() === "medium"
-  ).length;
+    const highRisk = readings.filter(
+        (item) => item.riskLevel === "High"
+    ).length;
 
 
-
-  const high = pineapples.filter(
-    (item) =>
-      item.riskLevel?.toLowerCase() === "high"
-  ).length;
+    const mediumRisk = readings.filter(
+        (item) => item.riskLevel === "Medium"
+    ).length;
 
 
+    const lowRisk = readings.filter(
+        (item) => item.riskLevel === "Low"
+    ).length;
 
 
+    const chartData = {
 
-  const chartData = {
-
-
-    labels:[
-
-      "Low",
-      "Medium",
-      "High"
-
-    ],
-
-
-
-    datasets:[
-
-
-      {
-
-        label:"AI Risk Level",
-
-
-        data:[
-
-          low,
-          medium,
-          high
-
+        labels: [
+            "High Risk",
+            "Medium Risk",
+            "Low Risk"
         ],
 
+        datasets: [
+            {
+                label: "Risk Level",
+
+                data: [
+                    highRisk,
+                    mediumRisk,
+                    lowRisk
+                ],
+
+                backgroundColor: [
+                    "#ef4444",
+                    "#f97316",
+                    "#22c55e"
+                ],
+
+                borderColor: [
+                    "#ef4444",
+                    "#f97316",
+                    "#22c55e"
+                ],
+
+                borderWidth: 1,
+
+                borderRadius: 10,
+
+                barThickness: 55
+            }
+        ]
+
+    };
 
 
-        backgroundColor:[
+    const options = {
 
-          "#22c55e",
-          "#eab308",
-          "#ef4444"
+        responsive: true,
 
-        ],
+        maintainAspectRatio: true,
 
+        plugins: {
 
+            legend: {
+                display: false
+            },
 
-        borderRadius:10,
+            tooltip: {
 
+                backgroundColor:
+                    "rgba(15, 23, 42, 0.95)",
 
-        barThickness:45
+                titleColor: "#facc15",
 
+                bodyColor: "white",
 
-      }
+                padding: 12,
 
+                callbacks: {
 
-    ]
+                    label: function (context) {
 
+                        return (
+                            "Readings: " +
+                            context.parsed.y
+                        );
 
-  };
+                    }
 
+                }
 
+            }
 
+        },
 
+        scales: {
 
+            y: {
 
+                beginAtZero: true,
 
-  const options={
+                ticks: {
 
+                    color:
+                        "rgba(255,255,255,0.75)",
 
-    responsive:true,
+                    precision: 0
 
+                },
 
+                grid: {
 
-    plugins:{
+                    color:
+                        "rgba(255,255,255,0.08)"
 
+                },
 
-      legend:{
+                title: {
 
+                    display: true,
 
-        display:false
+                    text: "Number of Readings",
 
+                    color:
+                        "rgba(255,255,255,0.85)"
 
-      },
+                }
 
+            },
 
+            x: {
 
-      tooltip:{
+                ticks: {
 
+                    color:
+                        "rgba(255,255,255,0.85)",
 
-        enabled:true
+                    font: {
+                        size: 13,
+                        weight: "600"
+                    }
 
+                },
 
-      }
+                grid: {
+                    display: false
+                },
 
+                title: {
 
-    },
+                    display: true,
 
+                    text: "Risk Classification",
 
+                    color:
+                        "rgba(255,255,255,0.85)"
 
+                }
 
-    scales:{
-
-
-
-      y:{
-
-
-        beginAtZero:true,
-
-
-        ticks:{
-
-
-          color:"white",
-
-
-          stepSize:1
-
+            }
 
         }
 
-
-      },
-
+    };
 
 
+    return (
+
+        <div className="risk-chart-container">
+
+            <div className="risk-chart-header">
+
+                <div className="risk-chart-title">
+
+                    <span className="risk-chart-icon">
+                        ⚠️
+                    </span>
+
+                    <h2>
+                        Risk Analysis
+                    </h2>
+
+                </div>
+
+                <p>
+                    AI-based pineapple storage
+                    risk classification
+                </p>
+
+            </div>
 
 
-      x:{
+            {readings.length > 0 ? (
 
+                <div className="risk-chart-wrapper">
 
-        ticks:{
+                    <Bar
+                        data={chartData}
+                        options={options}
+                    />
 
+                </div>
 
-          color:"white"
+            ) : (
 
+                <div className="risk-chart-empty">
 
-        }
+                    <span>
+                        ⚠️
+                    </span>
 
+                    <p>
+                        Waiting for risk data...
+                    </p>
 
-      }
+                </div>
 
+            )}
 
+        </div>
 
-    }
-
-
-  };
-
-
-
-
-
-
-
-
-return (
-
-
-
-<div className="risk-chart-container">
-
-
-
-<h2>
-
-🔔 AI Risk Analysis
-
-</h2>
-
-
-
-
-
-<Bar
-
-data={chartData}
-
-options={options}
-
-/>
-
-
-
-
-</div>
-
-
-
-);
-
-
+    );
 
 }
-
 
 
 export default RiskChart;

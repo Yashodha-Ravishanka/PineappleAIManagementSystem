@@ -3,156 +3,316 @@ import "./AIPrediction.css";
 
 import { getAllPineapples } from "../services/api";
 
-
 function AIPrediction() {
+    const [latest, setLatest] = useState(null);
+
+    useEffect(() => {
+        loadLatest();
+    }, []);
+
+    async function loadLatest() {
+        try {
+            const data = await getAllPineapples();
+
+            if (data && data.length > 0) {
+                const latestReading = data.reduce(
+                    (latestItem, currentItem) => {
+                        return new Date(currentItem.timestamp) >
+                            new Date(latestItem.timestamp)
+                            ? currentItem
+                            : latestItem;
+                    }
+                );
+
+                setLatest(latestReading);
+            }
+        } catch (error) {
+            console.log("AI prediction error:", error);
+        }
+    }
+
+    function getQualityClass(quality) {
+        switch (quality?.toLowerCase()) {
+            case "good":
+                return "ai-quality-good";
+
+            case "average":
+                return "ai-quality-average";
+
+            case "bad":
+                return "ai-quality-bad";
+
+            default:
+                return "ai-quality-pending";
+        }
+    }
+
+    function getRiskClass(risk) {
+        switch (risk?.toLowerCase()) {
+            case "low":
+                return "ai-risk-low";
+
+            case "medium":
+                return "ai-risk-medium";
+
+            case "high":
+                return "ai-risk-high";
+
+            default:
+                return "ai-risk-pending";
+        }
+    }
+
+    return (
+        <div className="ai-prediction">
+
+            {/* ===============================
+                HEADER
+                =============================== */}
+
+            <div className="ai-header">
+
+                <div className="ai-header-icon">
+                    🤖
+                </div>
+
+                <div>
+
+                    <h2>
+                        Latest AI Quality Prediction
+                    </h2>
+
+                    <p>
+                        AI-based pineapple quality and
+                        storage risk assessment
+                    </p>
+
+                </div>
+
+            </div>
+
+            {/* ===============================
+                PREDICTION
+                =============================== */}
+
+            {latest ? (
+
+                <div className="prediction-result">
+
+                    <div className="prediction-batch">
+
+                        <div>
+
+                            <span className="batch-label">
+                                Monitored Batch
+                            </span>
+
+                            <strong>
+                                🍍 {latest.batchId}
+                            </strong>
+
+                        </div>
+
+                        <span className="ai-active">
+                            ● AI Analysis
+                        </span>
+
+                    </div>
 
 
-const [latest, setLatest] = useState(null);
+                    {/* ===============================
+                        SENSOR DATA
+                        =============================== */}
+
+                    <div className="prediction-grid">
+
+                        <div className="prediction-card">
+
+                            <span className="prediction-icon">
+                                🌡️
+                            </span>
+
+                            <div>
+
+                                <span>
+                                    Temperature
+                                </span>
+
+                                <strong>
+                                    {latest.temperature ?? "--"} °C
+                                </strong>
+
+                            </div>
+
+                        </div>
 
 
+                        <div className="prediction-card">
 
-useEffect(()=>{
+                            <span className="prediction-icon">
+                                💧
+                            </span>
 
-loadLatest();
+                            <div>
+
+                                <span>
+                                    Humidity
+                                </span>
+
+                                <strong>
+                                    {latest.humidity ?? "--"} %
+                                </strong>
+
+                            </div>
+
+                        </div>
 
 
-},[]);
+                        <div className="prediction-card">
+
+                            <span className="prediction-icon">
+                                📅
+                            </span>
+
+                            <div>
+
+                                <span>
+                                    Storage Days
+                                </span>
+
+                                <strong>
+                                    {latest.storage_days ?? 0}
+                                </strong>
+
+                            </div>
+
+                        </div>
 
 
+                        <div className="prediction-card">
 
-async function loadLatest(){
+                            <span className="prediction-icon">
+                                🧪
+                            </span>
+
+                            <div>
+
+                                <span>
+                                    MQ135 Raw
+                                </span>
+
+                                <strong>
+                                    {latest.mq135 ?? 0}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
 
-try{
+                    {/* ===============================
+                        AI RESULT
+                        =============================== */}
+
+                    <div className="ai-result-section">
+
+                        <div className="ai-result-card">
+
+                            <span className="result-label">
+                                ⭐ Predicted Quality
+                            </span>
+
+                            <span
+                                className={getQualityClass(
+                                    latest.quality
+                                )}
+                            >
+                                {latest.quality || "Pending"}
+                            </span>
+
+                        </div>
 
 
-const data = await getAllPineapples();
+                        <div className="ai-result-card">
+
+                            <span className="result-label">
+                                ⚠ Risk Level
+                            </span>
+
+                            <span
+                                className={getRiskClass(
+                                    latest.riskLevel
+                                )}
+                            >
+                                {latest.riskLevel || "Pending"}
+                            </span>
+
+                        </div>
+
+                    </div>
 
 
-if(data.length > 0){
+                    {/* ===============================
+                        RECOMMENDATION
+                        =============================== */}
 
-setLatest(
-data[data.length - 1]
-);
+                    <div className="ai-recommendation">
 
+                        <div className="recommendation-title">
+                            🤖 AI Recommendation
+                        </div>
+
+                        <p>
+                            {latest.recommendation ||
+                                "No recommendation available."}
+                        </p>
+
+                    </div>
+
+
+                    {/* ===============================
+                        TIMESTAMP
+                        =============================== */}
+
+                    <div className="ai-last-update">
+
+                        🕒 Last analyzed:{" "}
+
+                        {latest.timestamp
+                            ? new Date(
+                                latest.timestamp
+                            ).toLocaleString()
+                            : "N/A"}
+
+                    </div>
+
+                </div>
+
+            ) : (
+
+                <div className="ai-empty">
+
+                    <span>
+                        🤖
+                    </span>
+
+                    <strong>
+                        No AI prediction available
+                    </strong>
+
+                    <p>
+                        Waiting for pineapple sensor
+                        data and AI analysis.
+                    </p>
+
+                </div>
+
+            )}
+
+        </div>
+    );
 }
-
-
-}
-
-catch(error){
-
-console.log(error);
-
-}
-
-
-}
-
-
-
-
-return (
-
-
-<div className="ai-prediction">
-
-
-<h2>
-🤖 Latest AI Quality Prediction
-</h2>
-
-
-
-{
-
-latest ? (
-
-
-<div className="prediction-result">
-
-
-<p>
-<strong>Batch:</strong> {latest.batchId}
-</p>
-
-
-<p>
-<strong>Temperature:</strong> {latest.temperature}°C
-</p>
-
-
-<p>
-<strong>Humidity:</strong> {latest.humidity}%
-</p>
-
-
-<p>
-<strong>Storage Days:</strong> {latest.storage_days}
-</p>
-
-
-
-<p>
-<strong>Quality:</strong>
-
-<span className={
-
-`quality-${latest.quality}`
-
-}>
-
-{latest.quality}
-
-</span>
-
-</p>
-
-
-
-<p>
-<strong>Risk Level:</strong>
-
-<span className={
-
-`risk-${latest.riskLevel}`
-
-}>
-
-{latest.riskLevel}
-
-</span>
-
-</p>
-
-
-
-</div>
-
-
-)
-
-
-:
-
-
-<p>
-No AI prediction available
-</p>
-
-
-}
-
-
-
-</div>
-
-
-);
-
-
-}
-
-
 
 export default AIPrediction;

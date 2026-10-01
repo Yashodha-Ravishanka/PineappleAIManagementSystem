@@ -1,0 +1,160 @@
+
+.ai-price-prediction {
+    margin-top: 24px;
+    padding: 24px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ai-price-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.ai-price-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(250, 204, 21, 0.15);
+    font-size: 25px;
+}
+
+.ai-price-header h2 {
+    margin: 0;
+}
+
+.ai-price-header p {
+    margin: 5px 0 0;
+    opacity: 0.7;
+}
+
+.ml-status {
+    margin-left: auto;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ai-price-batch {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ai-price-batch span {
+    opacity: 0.65;
+}
+
+.ai-price-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.price-input-card {
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.price-input-card span {
+    display: block;
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 7px;
+}
+
+.price-input-card strong {
+    font-size: 17px;
+}
+
+.ai-price-result {
+    margin-top: 20px;
+    padding: 25px;
+    text-align: center;
+    border-radius: 16px;
+    background: rgba(250, 204, 21, 0.08);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+}
+
+.ai-price-result-label {
+    display: block;
+    font-size: 14px;
+    opacity: 0.75;
+}
+
+.ai-price-value {
+    display: block;
+    margin: 8px 0;
+    font-size: 32px;
+}
+
+.ai-price-model {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.ai-price-calculating,
+.ai-price-loading,
+.ai-price-empty,
+.ai-price-error {
+    padding: 18px;
+    text-align: center;
+    border-radius: 12px;
+}
+
+.ai-price-error {
+    margin-top: 15px;
+}
+
+.ai-price-footer {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.ai-price-empty span {
+    display: block;
+    font-size: 35px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 800px) {
+    .ai-price-inputs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ai-price-footer {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 500px) {
+    .ai-price-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-price-header {
+        align-items: flex-start;
+    }
+
+    .ml-status {
+        display: none;
+    }
+}

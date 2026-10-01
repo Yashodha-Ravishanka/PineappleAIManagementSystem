@@ -1,99 +1,540 @@
+/* =========================================================
+   MAIN AI CONTAINER
+   ========================================================= */
+
 .ai-prediction {
+    width: 100%;
+    max-width: 850px;
 
-  background: rgba(255,255,255,0.08);
+    box-sizing: border-box;
 
-  padding: 25px;
+    margin: 30px auto;
+    padding: 28px;
 
-  border-radius: 20px;
+    border-radius: 22px;
 
-  margin: 30px auto;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.09),
+            rgba(255, 255, 255, 0.035)
+        );
 
-  max-width: 600px;
+    backdrop-filter: blur(12px);
 
-  color: white;
+    border:
+        1px solid rgba(255, 255, 255, 0.12);
 
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.25);
+
+    color: white;
 }
 
 
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-.ai-prediction h2 {
+.ai-header {
+    display: flex;
 
-  text-align: center;
+    align-items: center;
 
-  color: #facc15;
+    gap: 15px;
 
-  margin-bottom: 20px;
+    margin-bottom: 24px;
 
+    padding-bottom: 18px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.10);
+}
+
+.ai-header-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 55px;
+    height: 55px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    background:
+        rgba(168, 85, 247, 0.13);
+
+    font-size: 29px;
+}
+
+.ai-header h2 {
+    margin: 0;
+
+    color: #facc15;
+
+    font-size: 24px;
+
+    font-weight: 750;
+}
+
+.ai-header p {
+    margin: 6px 0 0;
+
+    color:
+        rgba(255, 255, 255, 0.58);
+
+    font-size: 13px;
 }
 
 
-
-.ai-prediction input {
-
-  width: 100%;
-
-  padding: 12px;
-
-  margin: 8px 0;
-
-  border-radius: 10px;
-
-  border: none;
-
-  font-size: 16px;
-
-}
-
-
-
-.ai-prediction button {
-
-  width: 100%;
-
-  padding: 12px;
-
-  margin-top: 15px;
-
-  background: #16a34a;
-
-  color: white;
-
-  border: none;
-
-  border-radius: 10px;
-
-  cursor: pointer;
-
-  font-size: 16px;
-
-}
-
-
-
-.ai-prediction button:hover {
-
-  background: #15803d;
-
-}
-
-
+/* =========================================================
+   BATCH HEADER
+   ========================================================= */
 
 .prediction-result {
+    padding: 20px;
 
-  margin-top: 25px;
+    border-radius: 16px;
 
-  padding: 20px;
+    background:
+        rgba(0, 0, 0, 0.14);
 
-  background: rgba(0,0,0,0.3);
+    border:
+        1px solid rgba(255, 255, 255, 0.07);
+}
 
-  border-radius: 15px;
+.prediction-batch {
+    display: flex;
 
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding-bottom: 18px;
+
+    margin-bottom: 20px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+}
+
+.batch-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color:
+        rgba(255, 255, 255, 0.50);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.7px;
+}
+
+.prediction-batch strong {
+    color: white;
+
+    font-size: 18px;
+}
+
+.ai-active {
+    padding: 7px 11px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(34, 197, 94, 0.12);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.25);
+
+    color: #86efac;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
 
+/* =========================================================
+   SENSOR CARDS
+   ========================================================= */
 
-.prediction-result h3 {
+.prediction-grid {
+    display: grid;
 
-  color: #facc15;
+    grid-template-columns:
+        repeat(4, 1fr);
 
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.prediction-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.06);
+}
+
+.prediction-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    font-size: 19px;
+}
+
+.prediction-card span:not(.prediction-icon) {
+    display: block;
+
+    color:
+        rgba(255, 255, 255, 0.52);
+
+    font-size: 11px;
+}
+
+.prediction-card strong {
+    display: block;
+
+    margin-top: 4px;
+
+    color: white;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   AI RESULTS
+   ========================================================= */
+
+.ai-result-section {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+.ai-result-card {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 17px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.07);
+}
+
+.result-label {
+    color:
+        rgba(255, 255, 255, 0.70);
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   QUALITY / RISK BADGES
+   ========================================================= */
+
+.ai-quality-good,
+.ai-quality-average,
+.ai-quality-bad,
+.ai-quality-pending,
+.ai-risk-low,
+.ai-risk-medium,
+.ai-risk-high,
+.ai-risk-pending {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 75px;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border: 1px solid transparent;
+}
+
+
+/* QUALITY */
+
+.ai-quality-good {
+    background:
+        rgba(34, 197, 94, 0.15);
+
+    border-color:
+        rgba(34, 197, 94, 0.30);
+
+    color: #86efac;
+}
+
+.ai-quality-average {
+    background:
+        rgba(250, 204, 21, 0.15);
+
+    border-color:
+        rgba(250, 204, 21, 0.30);
+
+    color: #fde68a;
+}
+
+.ai-quality-bad {
+    background:
+        rgba(239, 68, 68, 0.15);
+
+    border-color:
+        rgba(239, 68, 68, 0.30);
+
+    color: #fca5a5;
+}
+
+.ai-quality-pending {
+    background:
+        rgba(100, 116, 139, 0.18);
+
+    color: #cbd5e1;
+}
+
+
+/* RISK */
+
+.ai-risk-low {
+    background:
+        rgba(34, 197, 94, 0.15);
+
+    border-color:
+        rgba(34, 197, 94, 0.30);
+
+    color: #86efac;
+}
+
+.ai-risk-medium {
+    background:
+        rgba(249, 115, 22, 0.15);
+
+    border-color:
+        rgba(249, 115, 22, 0.30);
+
+    color: #fdba74;
+}
+
+.ai-risk-high {
+    background:
+        rgba(239, 68, 68, 0.15);
+
+    border-color:
+        rgba(239, 68, 68, 0.30);
+
+    color: #fca5a5;
+}
+
+.ai-risk-pending {
+    background:
+        rgba(100, 116, 139, 0.18);
+
+    color: #cbd5e1;
+}
+
+
+/* =========================================================
+   AI RECOMMENDATION
+   ========================================================= */
+
+.ai-recommendation {
+    padding: 16px 18px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(250, 204, 21, 0.06);
+
+    border:
+        1px solid rgba(250, 204, 21, 0.13);
+}
+
+.recommendation-title {
+    color: #facc15;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.ai-recommendation p {
+    margin: 8px 0 0;
+
+    color:
+        rgba(255, 255, 255, 0.75);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LAST UPDATE
+   ========================================================= */
+
+.ai-last-update {
+    margin-top: 15px;
+
+    text-align: center;
+
+    color:
+        rgba(255, 255, 255, 0.45);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.ai-empty {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 220px;
+
+    text-align: center;
+
+    color:
+        rgba(255, 255, 255, 0.60);
+}
+
+.ai-empty span {
+    margin-bottom: 12px;
+
+    font-size: 45px;
+}
+
+.ai-empty strong {
+    color: white;
+
+    font-size: 16px;
+}
+
+.ai-empty p {
+    margin-top: 7px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .prediction-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .ai-prediction {
+        padding: 20px;
+    }
+
+    .ai-header h2 {
+        font-size: 20px;
+    }
+
+    .ai-header-icon {
+        width: 46px;
+        height: 46px;
+
+        font-size: 24px;
+    }
+
+    .prediction-result {
+        padding: 15px;
+    }
+
+    .prediction-batch {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .ai-result-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 450px) {
+
+    .prediction-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prediction-card {
+        padding: 13px;
+    }
 }

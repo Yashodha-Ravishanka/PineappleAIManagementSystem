@@ -1,11 +1,11 @@
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
 } from "chart.js";
 
 import { Bar } from "react-chartjs-2";
@@ -14,164 +14,256 @@ import "./QualityChart.css";
 
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
 );
-
 
 
 function QualityChart({ pineapples }) {
 
-
-  // AI predicted Quality Analysis
-
-  const good = pineapples.filter(
-    item => item.quality === "Good"
-  ).length;
+    const readings = pineapples || [];
 
 
-  const average = pineapples.filter(
-    item => item.quality === "Average"
-  ).length;
+    // AI predicted quality analysis
+
+    const good = readings.filter(
+        (item) => item.quality === "Good"
+    ).length;
 
 
-  const bad = pineapples.filter(
-    item => item.quality === "Bad"
-  ).length;
+    const average = readings.filter(
+        (item) => item.quality === "Average"
+    ).length;
 
 
-
-  const chartData = {
-
-    labels: [
-      "Good",
-      "Average",
-      "Bad"
-    ],
+    const bad = readings.filter(
+        (item) => item.quality === "Bad"
+    ).length;
 
 
-    datasets: [
+    const chartData = {
 
-      {
-
-        label: "Pineapple Quality",
-
-        data:[
-          good,
-          average,
-          bad
+        labels: [
+            "Good",
+            "Average",
+            "Bad"
         ],
 
+        datasets: [
+            {
+                label: "Pineapple Quality",
 
-        backgroundColor: [
+                data: [
+                    good,
+                    average,
+                    bad
+                ],
 
-          "#22c55e",
+                backgroundColor: [
+                    "#22c55e",
+                    "#eab308",
+                    "#ef4444"
+                ],
 
-          "#eab308",
+                borderColor: [
+                    "#22c55e",
+                    "#eab308",
+                    "#ef4444"
+                ],
 
-          "#ef4444"
+                borderWidth: 1,
 
-        ],
+                borderRadius: 10,
 
+                barThickness: 55,
 
-        borderRadius: 10,
+                hoverBorderWidth: 2
+            }
+        ]
 
-        barThickness: 45
-
-      }
-
-    ]
-
-  };
-
-
-
-  const options = {
-
-    responsive:true,
-
-
-    plugins:{
-
-
-      legend:{
-
-        display:false
-
-      },
+    };
 
 
-      title:{
+    const options = {
 
-        display:false
+        responsive: true,
 
-      }
+        maintainAspectRatio: true,
 
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
 
-    },
+        plugins: {
 
+            legend: {
+                display: false
+            },
 
-    scales:{
+            title: {
+                display: false
+            },
 
+            tooltip: {
 
-      y:{
+                backgroundColor:
+                    "rgba(15, 23, 42, 0.95)",
 
-        beginAtZero:true,
+                titleColor: "#facc15",
 
+                bodyColor: "white",
 
-        ticks:{
+                padding: 12,
 
-          color:"white"
+                callbacks: {
+
+                    label: function (context) {
+
+                        return (
+                            "Readings: " +
+                            context.parsed.y
+                        );
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    color:
+                        "rgba(255,255,255,0.75)",
+
+                    precision: 0
+
+                },
+
+                grid: {
+
+                    color:
+                        "rgba(255,255,255,0.08)"
+
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Number of Readings",
+
+                    color:
+                        "rgba(255,255,255,0.85)"
+
+                }
+
+            },
+
+            x: {
+
+                ticks: {
+
+                    color:
+                        "rgba(255,255,255,0.85)",
+
+                    font: {
+                        size: 13,
+                        weight: "600"
+                    }
+
+                },
+
+                grid: {
+                    display: false
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Quality Classification",
+
+                    color:
+                        "rgba(255,255,255,0.85)"
+
+                }
+
+            }
 
         }
 
-      },
+    };
 
 
-      x:{
+    return (
+
+        <div className="quality-chart-container">
+
+            <div className="quality-chart-header">
+
+                <div className="quality-chart-title">
+
+                    <span className="quality-chart-icon">
+                        📊
+                    </span>
+
+                    <h2>
+                        Quality Analysis
+                    </h2>
+
+                </div>
+
+                <p>
+                    AI-predicted pineapple quality
+                    distribution
+                </p>
+
+            </div>
 
 
-        ticks:{
+            {readings.length > 0 ? (
 
-          color:"white"
+                <div className="quality-chart-wrapper">
 
-        }
+                    <Bar
+                        data={chartData}
+                        options={options}
+                    />
 
-      }
+                </div>
 
+            ) : (
 
-    }
+                <div className="quality-chart-empty">
 
-  };
+                    <span>
+                        📊
+                    </span>
 
+                    <p>
+                        Waiting for quality data...
+                    </p>
 
+                </div>
 
-  return (
+            )}
 
-    <div className="chart-container">
+        </div>
 
-
-      <h2>
-        📊 Quality Analysis
-      </h2>
-
-
-      <Bar
-
-        data={chartData}
-
-        options={options}
-
-      />
-
-
-    </div>
-
-  );
+    );
 
 }
 
