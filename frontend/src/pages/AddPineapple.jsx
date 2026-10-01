@@ -1,332 +1,230 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./AddPineapple.css";
 
 const API_URL = "http://localhost:3000/api/pineapple";
-
-const PHOTO_AI_URL =
-"http://127.0.0.1:5000/predict";
-
+const PHOTO_AI_URL = "http://127.0.0.1:5000/predict";
 const QR_API_URL =
-"https://pineapple-ai-backend.de.deplexo.com/api/qr/generate";
+    "https://pineapple-ai-backend.de.deplexo.com/api/qr/generate";
 
 function AddPineapple() {
+    const [formData, setFormData] = useState({
+        batchId: "",
+        storage_days: "",
+        fruitWeight: "",
+        sizeGrade: "Large",
+        marketPrice: "",
+        aromaScore: "",
+        sweetnessBrix: "",
+        fruitLength: "",
+        fruitWidth: "",
+        fruitHeight: ""
+    });
 
-const [formData, setFormData] = useState({
+    const [environment, setEnvironment] = useState(null);
+    const [loadingEnvironment, setLoadingEnvironment] = useState(true);
 
-    batchId: "",
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
 
-    storage_days: "",
+    const [photoPrediction, setPhotoPrediction] = useState(null);
+    const [qualityGrade, setQualityGrade] = useState("Pending");
+    const [qualityScore, setQualityScore] = useState(0);
 
-    fruitWeight: "",
+    const [submitting, setSubmitting] = useState(false);
 
-    sizeGrade: "Large",
+    const [generatedQR, setGeneratedQR] = useState(null);
+    const [qrModalVisible, setQRModalVisible] = useState(false);
 
-    marketPrice: "",
+    // Keep the successfully generated batch ID
+    // even after the form is reset.
+    const [generatedBatchId, setGeneratedBatchId] = useState("");
 
-    aromaScore: "",
+    /*
+     * ---------------------------------------------------------
+     * GET LATEST WAREHOUSE ENVIRONMENT
+     * ---------------------------------------------------------
+     */
+    const loadEnvironment = async () => {
+        try {
+            const response = await axios.get(
+                `${API_URL}/environment/latest?warehouseId=WH-001`
+            );
 
-    sweetnessBrix: "",
+            console.log(
+                "LATEST WAREHOUSE ENVIRONMENT:",
+                response.data
+            );
 
-    fruitLength: "",
-
-    fruitWidth: "",
-
-    fruitHeight: ""
-
-});
-
-
-const [environment, setEnvironment] =
-    useState(null);
-
-const [environmentLoading, setEnvironmentLoading] =
-    useState(true);
-
-const [environmentError, setEnvironmentError] =
-    useState("");
-
-
-const [selectedImage, setSelectedImage] =
-    useState(null);
-
-const [imagePreview, setImagePreview] =
-    useState("");
-
-const [aiResult, setAiResult] =
-    useState(null);
-
-const [aiLoading, setAiLoading] =
-    useState(false);
-
-const [aiError, setAiError] =
-    useState("");
-
-
-const [loading, setLoading] =
-    useState(false);
-
-const [generatedQR, setGeneratedQR] =
-    useState(null);
-
-const [qrModalVisible, setQRModalVisible] =
-    useState(false);
-
-
-// ==========================================
-// GET LATEST WAREHOUSE ENVIRONMENT
-// ==========================================
-
-const loadEnvironment = async () => {
-
-    try {
-
-        setEnvironmentLoading(true);
-
-        setEnvironmentError("");
-
-        const response = await axios.get(
-            `${API_URL}/environment/latest?warehouseId=WH-001`
-        );
-
-
-        if (response.data.success) {
-
-            setEnvironment(response.data);
-
-        } else {
-
-            setEnvironment(null);
-
+            if (response.data?.success) {
+                setEnvironment(response.data);
+            }
+        } catch (error) {
+            console.error(
+                "Environment loading error:",
+                error
+            );
+        } finally {
+            setLoadingEnvironment(false);
         }
-
-    } catch (error) {
-
-        console.error(
-            "Environment loading error:",
-            error
-        );
-
-        setEnvironment(null);
-
-        setEnvironmentError(
-            error.response?.data?.message ||
-            "No ESP32 sensor data available."
-        );
-
-    } finally {
-
-        setEnvironmentLoading(false);
-
-    }
-
-};
-
-
-// ==========================================
-// LOAD ENVIRONMENT
-// ==========================================
-
-useEffect(() => {
-
-    loadEnvironment();
-
-    const interval = setInterval(
-        loadEnvironment,
-        5000
-    );
-
-    return () => {
-        clearInterval(interval);
     };
 
-}, []);
+    useEffect(() => {
+        loadEnvironment();
 
+        const interval = setInterval(() => {
+            loadEnvironment();
+        }, 5000);
 
-// ==========================================
-// FORM CHANGE
-// ==========================================
+        return () => clearInterval(interval);
+    }, []);
 
-const handleChange = (e) => {
+    /*
+     * ---------------------------------------------------------
+     * FORM INPUT
+     * ---------------------------------------------------------
+     */
+    const handleChange = (e) => {
+        const { name, value } = e.target;
 
-    const {
-        name,
-        value
-    } = e.target;
+        setFormData((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+    };
 
-    setFormData(previous => ({
-        ...previous,
-        [name]: value
-    }));
+    /*
+     * ---------------------------------------------------------
+     * IMAGE SELECT
+     * ---------------------------------------------------------
+     */
+    const handleImageChange = (e) => {
+        const file = e.target.files?.[0];
 
-};
+        if (!file) {
+            return;
+        }
 
+        setSelectedImage(file);
+        setImagePreview(URL.createObjectURL(file));
 
-// ==========================================
-// IMAGE SELECTION
-// ==========================================
+        setPhotoPrediction(null);
+        setQualityGrade("Pending");
+        setQualityScore(0);
+    };
 
-const handleImageChange = (e) => {
+    /*
+     * ---------------------------------------------------------
+     * FIND BEST PHOTO AI PREDICTION
+     * ---------------------------------------------------------
+     */
+    const getBestPrediction = (data) => {
+        if (!data) {
+            return null;
+        }
 
-    const file =
-        e.target.files?.[0];
+        if (data.best_prediction) {
+            return data.best_prediction;
+        }
 
-    if (!file) return;
+        if (
+            Array.isArray(data.predictions) &&
+            data.predictions.length > 0
+        ) {
+            return [...data.predictions].sort(
+                (a, b) =>
+                    Number(b.confidence || 0) -
+                    Number(a.confidence || 0)
+            )[0];
+        }
 
+        if (data.prediction) {
+            return data.prediction;
+        }
 
-    setSelectedImage(file);
+        return null;
+    };
 
-    setImagePreview(
-        URL.createObjectURL(file)
-    );
+    /*
+     * ---------------------------------------------------------
+     * CALCULATE PHOTO QUALITY GRADE
+     * ---------------------------------------------------------
+     */
+    const calculatePhotoGrade = (prediction) => {
+        if (!prediction) {
+            return "Pending";
+        }
 
-    setAiResult(null);
-
-    setAiError("");
-
-};
-
-
-// ==========================================
-// GET BEST PHOTO PREDICTION
-// ==========================================
-
-const getBestPrediction = (result) => {
-
-    if (result?.best_prediction) {
-
-        return result.best_prediction;
-
-    }
-
-
-    if (
-        result?.predictions &&
-        result.predictions.length > 0
-    ) {
-
-        return result.predictions.reduce(
-            (best, current) =>
-                current.confidence >
-                best.confidence
-                    ? current
-                    : best
-        );
-
-    }
-
-
-    return null;
-
-};
-
-
-// ==========================================
-// CALCULATE PHOTO QUALITY GRADE
-// ==========================================
-
-const calculatePhotoGrade = (
-    prediction
-) => {
-
-    if (!prediction) {
-
-        return "Pending";
-
-    }
-
-
-    const className =
-        String(
-            prediction.class_name || ""
+        const className = String(
+            prediction.class ||
+                prediction.class_name ||
+                prediction.name ||
+                prediction.label ||
+                ""
         ).toLowerCase();
 
-
-    const confidence =
-        Number(
-            prediction.confidence
+        const confidence = Number(
+            prediction.confidence || 0
         );
 
-
-    // Rotten pineapple
-    if (
-        className.includes("rotten")
-    ) {
-
-        return "D";
-
-    }
-
-
-    // Fresh pineapple
-    if (
-        className.includes("fresh")
-    ) {
-
-        if (confidence >= 0.90) {
-
-            return "A";
-
+        /*
+         * Rotten fruit
+         */
+        if (className.includes("rotten")) {
+            return "D";
         }
 
-        if (confidence >= 0.75) {
+        /*
+         * Fresh fruit
+         */
+        if (className.includes("fresh")) {
+            if (confidence >= 0.9) {
+                return "A";
+            }
 
-            return "B";
+            if (confidence >= 0.75) {
+                return "B";
+            }
 
+            if (confidence >= 0.6) {
+                return "C";
+            }
+
+            return "D";
         }
 
-        if (confidence >= 0.60) {
+        return "Pending";
+    };
 
-            return "C";
-
+    /*
+     * ---------------------------------------------------------
+     * RUN PHOTO AI
+     * ---------------------------------------------------------
+     */
+    const handlePhotoPrediction = async () => {
+        if (!selectedImage) {
+            alert(
+                "Please select a pineapple image first."
+            );
+            return;
         }
 
-        return "D";
+        try {
+            const imageData = new FormData();
 
-    }
+            /*
+             * IMPORTANT:
+             * Photo AI expects the field name "image".
+             */
+            imageData.append(
+                "image",
+                selectedImage
+            );
 
-
-    return "Pending";
-
-};
-
-
-// ==========================================
-// RUN PHOTO AI
-// ==========================================
-
-const handlePhotoPrediction = async () => {
-
-    if (!selectedImage) {
-
-        setAiError(
-            "Please select a pineapple image first."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        setAiLoading(true);
-
-        setAiError("");
-
-        const data =
-            new FormData();
-
-        data.append(
-            "image",
-            selectedImage
-        );
-
-
-        const response =
-            await axios.post(
+            const response = await axios.post(
                 PHOTO_AI_URL,
-                data,
+                imageData,
                 {
                     headers: {
                         "Content-Type":
@@ -335,902 +233,924 @@ const handlePhotoPrediction = async () => {
                 }
             );
 
+            console.log(
+                "PHOTO AI RESPONSE:",
+                response.data
+            );
 
-        const result =
-            response.data;
+            const bestPrediction =
+                getBestPrediction(
+                    response.data
+                );
 
+            if (!bestPrediction) {
+                alert(
+                    "Photo AI could not detect the pineapple."
+                );
+                return;
+            }
 
-        const bestPrediction =
-            getBestPrediction(result);
+            const confidence = Number(
+                bestPrediction.confidence || 0
+            );
 
+            const grade =
+                calculatePhotoGrade(
+                    bestPrediction
+                );
 
-        const grade =
-            calculatePhotoGrade(
+            setPhotoPrediction(
                 bestPrediction
             );
 
-
-        setAiResult({
-
-            ...result,
-
-            bestPrediction,
-
-            grade
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "Photo AI error:",
-            error
-        );
-
-        setAiError(
-            error.response?.data?.message ||
-            "Photo AI prediction failed."
-        );
-
-    } finally {
-
-        setAiLoading(false);
-
-    }
-
-};
-
-
-// ==========================================
-// SUBMIT
-// ==========================================
-
-const handleSubmit = async (e) => {
-
-    e.preventDefault();
-
-
-    // ======================================
-    // CHECK ENVIRONMENT
-    // ======================================
-
-    if (!environment) {
-
-        alert(
-            "No warehouse temperature/humidity data is available. Please make sure the ESP32 is connected and sending sensor data."
-        );
-
-        return;
-
-    }
-
-
-    // ======================================
-    // CHECK PHOTO AI
-    // ======================================
-
-    if (!aiResult?.bestPrediction) {
-
-        alert(
-            "Please select a pineapple image and run Photo AI before adding the batch."
-        );
-
-        return;
-
-    }
-
-
-    // ======================================
-    // CHECK BATCH ID
-    // ======================================
-
-    if (!formData.batchId.trim()) {
-
-        alert(
-            "Please enter a Batch ID."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        setLoading(true);
-
-
-        const bestPrediction =
-            aiResult.bestPrediction;
-
-
-        const qualityGrade =
-            aiResult.grade ||
-            "Pending";
-
-
-        const qualityScore =
-            Number(
-                bestPrediction.confidence
+            setQualityScore(
+                confidence
             );
 
+            setQualityGrade(
+                grade
+            );
 
-        // ==================================
-        // SEND BATCH TO BACKEND
-        // ==================================
+            console.log(
+                "PHOTO QUALITY GRADE:",
+                grade
+            );
 
-        const pineappleData = {
+            console.log(
+                "PHOTO QUALITY SCORE:",
+                confidence
+            );
 
-            batchId:
-                formData.batchId.trim(),
+            alert(
+                `Photo analysis completed.\nQuality Grade: ${grade}\nConfidence: ${Math.round(
+                    confidence * 100
+                )}%`
+            );
+        } catch (error) {
+            console.error(
+                "PHOTO AI ERROR:",
+                error
+            );
 
-            warehouseId:
-                "WH-001",
+            if (error.response) {
+                console.error(
+                    "PHOTO AI SERVER RESPONSE:",
+                    error.response.data
+                );
+            }
 
-            storage_days:
-                Number(
-                    formData.storage_days
-                ),
+            alert(
+                "Photo AI prediction failed. Make sure the Photo AI service is running on port 5000."
+            );
+        }
+    };
 
-            location:
-                environment.location ||
-                "Gampaha",
+    /*
+     * ---------------------------------------------------------
+     * SUBMIT PINEAPPLE
+     * ---------------------------------------------------------
+     */
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-            // Photo AI
-            qualityGrade,
+        if (submitting) {
+            return;
+        }
 
-            qualityScore
+        if (!formData.batchId.trim()) {
+            alert(
+                "Please enter a Batch ID."
+            );
+            return;
+        }
 
-        };
+        if (!formData.storage_days) {
+            alert(
+                "Please enter storage days."
+            );
+            return;
+        }
 
+        if (!environment) {
+            alert(
+                "Warehouse temperature and humidity data are not available."
+            );
+            return;
+        }
 
-        console.log(
-            "SENDING PINEAPPLE DATA:",
-            pineappleData
-        );
+        setSubmitting(true);
 
+        /*
+         * Save this before resetting the form.
+         */
+        const currentBatchId =
+            formData.batchId.trim();
 
-        const response =
-            await axios.post(
-                `${API_URL}/add`,
+        try {
+            /*
+             * -------------------------------------------------
+             * SAVE PINEAPPLE BATCH
+             * -------------------------------------------------
+             */
+            const pineappleData = {
+                batchId:
+                    currentBatchId,
+
+                warehouseId:
+                    "WH-001",
+
+                storage_days:
+                    Number(
+                        formData.storage_days
+                    ),
+
+                location:
+                    environment.location ||
+                    "Gampaha",
+
+                qualityGrade:
+                    qualityGrade,
+
+                qualityScore:
+                    Number(
+                        qualityScore
+                    )
+            };
+
+            console.log(
+                "SENDING PINEAPPLE DATA:",
                 pineappleData
             );
 
+            const batchResponse =
+                await axios.post(
+                    `${API_URL}/add`,
+                    pineappleData
+                );
 
-        console.log(
-            "BATCH SAVED:",
-            response.data
-        );
+            console.log(
+                "BATCH SAVED:",
+                batchResponse.data
+            );
 
+            /*
+             * -------------------------------------------------
+             * CONVERT PHOTO AI CONFIDENCE
+             *
+             * Photo AI:
+             *     0 - 1
+             *
+             * Price AI:
+             *     1 - 5
+             *
+             * Example:
+             *     0.8941 -> 4
+             * -------------------------------------------------
+             */
+            const photoScore5 =
+                Math.min(
+                    5,
+                    Math.max(
+                        1,
+                        Math.round(
+                            Number(
+                                qualityScore
+                            ) * 5
+                        )
+                    )
+                );
 
-        // ==================================
-        // GENERATE QR CODE
-        // ==================================
+            console.log(
+                "PHOTO SCORE 0-1:",
+                qualityScore
+            );
 
-        const qrData = {
+            console.log(
+                "QR / PRICE AI SCORE 1-5:",
+                photoScore5
+            );
 
-            batchId:
-                formData.batchId.trim(),
+            /*
+             * -------------------------------------------------
+             * QR DATA
+             * -------------------------------------------------
+             */
+            const qrData = {
+                batchId:
+                    currentBatchId,
 
-            warehouseId:
-                "WH-001",
+                warehouseId:
+                    "WH-001",
 
-            location:
-                environment.location ||
-                "Gampaha",
+                location:
+                    environment.location ||
+                    "Gampaha",
 
-            // Sensor values
-            temperature:
-                Number(
-                    environment.temperature
-                ),
+                temperature:
+                    Number(
+                        environment.temperature
+                    ),
 
-            humidity:
-                Number(
-                    environment.humidity
-                ),
+                humidity:
+                    Number(
+                        environment.humidity
+                    ),
 
-            storage_days:
-                Number(
-                    formData.storage_days
-                ),
+                storage_days:
+                    Number(
+                        formData.storage_days
+                    ),
 
-            // Product information
-            fruitWeight:
-                Number(
-                    formData.fruitWeight || 0
-                ),
+                fruitWeight:
+                    Number(
+                        formData.fruitWeight ||
+                            0
+                    ),
 
-            sizeGrade:
-                formData.sizeGrade,
+                sizeGrade:
+                    formData.sizeGrade,
 
-            marketPrice:
-                Number(
-                    formData.marketPrice || 0
-                ),
+                marketPrice:
+                    Number(
+                        formData.marketPrice ||
+                            0
+                    ),
 
-            aromaScore:
-                Number(
-                    formData.aromaScore || 0
-                ),
+                aromaScore:
+                    Number(
+                        formData.aromaScore ||
+                            0
+                    ),
 
-            sweetnessBrix:
-                Number(
-                    formData.sweetnessBrix || 0
-                ),
+                sweetnessBrix:
+                    Number(
+                        formData.sweetnessBrix ||
+                            0
+                    ),
 
-            fruitLength:
-                Number(
-                    formData.fruitLength || 0
-                ),
+                fruitLength:
+                    Number(
+                        formData.fruitLength ||
+                            0
+                    ),
 
-            fruitWidth:
-                Number(
-                    formData.fruitWidth || 0
-                ),
+                fruitWidth:
+                    Number(
+                        formData.fruitWidth ||
+                            0
+                    ),
 
-            fruitHeight:
-                Number(
-                    formData.fruitHeight || 0
-                ),
+                fruitHeight:
+                    Number(
+                        formData.fruitHeight ||
+                            0
+                    ),
 
-            // IMPORTANT:
-            // QR API expects a NUMBER.
-            // It must NOT receive A/B/C/D.
-            fruitQualityScore:
-                Math.round(
-                    qualityScore * 100
-                )
+                /*
+                 * Price AI requires 1-5.
+                 */
+                fruitQualityScore:
+                    photoScore5,
 
-        };
+                fruitRipenessScore:
+                    photoScore5
+            };
 
+            console.log(
+                "QR DATA:",
+                qrData
+            );
 
-        console.log(
-            "QR DATA:",
-            qrData
-        );
-
-
-        try {
-
+            /*
+             * -------------------------------------------------
+             * GENERATE QR
+             * -------------------------------------------------
+             */
             const qrResponse =
                 await axios.post(
                     QR_API_URL,
                     qrData
                 );
 
-
             console.log(
                 "QR RESPONSE:",
                 qrResponse.data
             );
 
-
+            /*
+             * -------------------------------------------------
+             * SAVE GENERATED QR
+             * -------------------------------------------------
+             */
             setGeneratedQR(
-                qrResponse.data
+                qrResponse.data.data
             );
 
-            setQRModalVisible(true);
-
-
-        } catch (qrError) {
-
-            console.error(
-                "QR generation error:",
-                qrError
+            setGeneratedBatchId(
+                currentBatchId
             );
 
+            setQRModalVisible(
+                true
+            );
+
+            /*
+             * -------------------------------------------------
+             * SUCCESS POPUP
+             * -------------------------------------------------
+             */
             alert(
-                "Pineapple batch was saved, but QR generation failed."
+                "Pineapple batch saved successfully and QR code generated!"
             );
 
+            /*
+             * -------------------------------------------------
+             * RESET FORM
+             * -------------------------------------------------
+             */
+            setFormData({
+                batchId: "",
+                storage_days: "",
+                fruitWeight: "",
+                sizeGrade: "Large",
+                marketPrice: "",
+                aromaScore: "",
+                sweetnessBrix: "",
+                fruitLength: "",
+                fruitWidth: "",
+                fruitHeight: ""
+            });
+
+            setSelectedImage(
+                null
+            );
+
+            setImagePreview(
+                ""
+            );
+
+            setPhotoPrediction(
+                null
+            );
+
+            setQualityGrade(
+                "Pending"
+            );
+
+            setQualityScore(
+                0
+            );
+        } catch (error) {
+            console.error(
+                "ADD PINEAPPLE ERROR:",
+                error
+            );
+
+            if (error.response) {
+                console.error(
+                    "SERVER RESPONSE:",
+                    error.response.data
+                );
+
+                alert(
+                    error.response.data?.message ||
+                        error.response.data?.error ||
+                        "Server returned an error."
+                );
+            } else {
+                alert(
+                    "Failed to save pineapple batch or generate QR code."
+                );
+            }
+        } finally {
+            setSubmitting(false);
         }
+    };
 
-
-        // ==================================
-        // RESET FORM
-        // ==================================
-
-        setFormData({
-
-            batchId: "",
-
-            storage_days: "",
-
-            fruitWeight: "",
-
-            sizeGrade: "Large",
-
-            marketPrice: "",
-
-            aromaScore: "",
-
-            sweetnessBrix: "",
-
-            fruitLength: "",
-
-            fruitWidth: "",
-
-            fruitHeight: ""
-
-        });
-
-
-        setSelectedImage(null);
-
-        setImagePreview("");
-
-        setAiResult(null);
-
-
-    } catch (error) {
-
-        console.error(
-            "Add pineapple error:",
-            error
+    /*
+     * ---------------------------------------------------------
+     * CLOSE QR MODAL
+     * ---------------------------------------------------------
+     */
+    const closeQRModal = () => {
+        setQRModalVisible(
+            false
         );
+    };
 
-        alert(
-            error.response?.data?.message ||
-            "Failed to add pineapple batch."
-        );
+    /*
+     * ---------------------------------------------------------
+     * RENDER
+     * ---------------------------------------------------------
+     */
+    return (
+        <div className="add-pineapple-page">
 
-    } finally {
+            <div className="add-pineapple-container">
 
-        setLoading(false);
+                <h1>
+                    Add Pineapple Batch
+                </h1>
 
-    }
-
-};
-
-
-// ==========================================
-// UI
-// ==========================================
-
-return (
-
-    <div className="add-pineapple">
-
-        <h2>
-            Add Pineapple Batch
-        </h2>
-
-
-        {/* =================================
-            WAREHOUSE ENVIRONMENT
-        ================================= */}
-
-        <div className="environment-card">
-
-            <h3>
-                🌡️ Warehouse Environment
-            </h3>
-
-
-            {environmentLoading && (
-
-                <p>
-                    Reading ESP32 sensor data...
+                <p className="page-description">
+                    Add a pineapple batch using
+                    warehouse sensor data and
+                    AI quality detection.
                 </p>
 
-            )}
+                {/* -------------------------------------------
+                    WAREHOUSE ENVIRONMENT
+                -------------------------------------------- */}
+                <div className="environment-card">
 
+                    <h2>
+                        Warehouse Environment
+                    </h2>
 
-            {!environmentLoading &&
-                environment && (
+                    {loadingEnvironment ? (
+                        <p>
+                            Loading sensor data...
+                        </p>
+                    ) : environment ? (
+                        <div className="environment-grid">
 
-                <div>
+                            <div>
+                                <strong>
+                                    Temperature
+                                </strong>
 
-                    <p>
-                        <strong>
-                            Temperature:
-                        </strong>{" "}
-                        {Number(
-                            environment.temperature
-                        ).toFixed(1)}
-                        °C
-                    </p>
+                                <span>
+                                    {
+                                        Number(
+                                            environment.temperature
+                                        ).toFixed(1)
+                                    } °C
+                                </span>
+                            </div>
 
+                            <div>
+                                <strong>
+                                    Humidity
+                                </strong>
 
-                    <p>
-                        <strong>
-                            Humidity:
-                        </strong>{" "}
-                        {Number(
-                            environment.humidity
-                        ).toFixed(1)}
-                        %
-                    </p>
+                                <span>
+                                    {
+                                        Number(
+                                            environment.humidity
+                                        ).toFixed(1)
+                                    } %
+                                </span>
+                            </div>
 
+                            <div>
+                                <strong>
+                                    MQ135
+                                </strong>
 
-                    <p>
-                        <strong>
-                            Air Quality:
-                        </strong>{" "}
-                        {environment.mq135}
-                    </p>
+                                <span>
+                                    {
+                                        Number(
+                                            environment.mq135 ||
+                                                0
+                                        )
+                                    }
+                                </span>
+                            </div>
 
+                            <div>
+                                <strong>
+                                    Location
+                                </strong>
 
-                    <p>
-                        <strong>
-                            Location:
-                        </strong>{" "}
-                        {environment.location}
-                    </p>
+                                <span>
+                                    {
+                                        environment.location ||
+                                        "Gampaha"
+                                    }
+                                </span>
+                            </div>
 
-
-                    <p>
-                        <strong>
-                            Sensor Time:
-                        </strong>{" "}
-
-                        {environment.timestamp
-                            ? new Date(
-                                environment.timestamp
-                            ).toLocaleString()
-                            : "Unknown"}
-
-                    </p>
-
-
-                    <p>
-                        🟢 ESP32 sensor connected
-                    </p>
+                        </div>
+                    ) : (
+                        <p>
+                            No warehouse sensor
+                            data available.
+                        </p>
+                    )}
 
                 </div>
 
-            )}
-
-
-            {!environmentLoading &&
-                !environment && (
-
-                <p>
-
-                    ⚠️{" "}
-
-                    {environmentError ||
-                        "No ESP32 sensor data available."}
-
-                </p>
-
-            )}
-
-        </div>
-
-
-        {/* =================================
-            FORM
-        ================================= */}
-
-        <form
-            onSubmit={handleSubmit}
-        >
-
-
-            {/* =================================
-                BASIC INFORMATION
-            ================================= */}
-
-            <div>
-
-                <label>
-                    Batch ID
-                </label>
-
-                <input
-                    type="text"
-                    name="batchId"
-                    value={
-                        formData.batchId
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    placeholder="Enter batch ID"
-                    required
-                />
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Storage Days
-                </label>
-
-                <input
-                    type="number"
-                    name="storage_days"
-                    value={
-                        formData.storage_days
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                    placeholder="Enter storage days"
-                    required
-                />
-
-            </div>
-
-
-            {/* =================================
-                PHOTO AI
-            ================================= */}
-
-            <div className="photo-ai-section">
-
-                <h3>
-                    📷 Pineapple Photo Analysis
-                </h3>
-
-
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={
-                        handleImageChange
-                    }
-                />
-
-
-                {imagePreview && (
-
-                    <img
-                        src={imagePreview}
-                        alt="Pineapple preview"
-                        style={{
-                            width: "250px",
-                            marginTop: "10px"
-                        }}
-                    />
-
-                )}
-
-
-                <button
-                    type="button"
-                    onClick={
-                        handlePhotoPrediction
-                    }
-                    disabled={
-                        aiLoading ||
-                        !selectedImage
+                {/* -------------------------------------------
+                    FORM
+                -------------------------------------------- */}
+                <form
+                    onSubmit={
+                        handleSubmit
                     }
                 >
 
-                    {aiLoading
-                        ? "Analyzing..."
-                        : "Analyze Photo"}
+                    <div className="form-group">
 
-                </button>
+                        <label>
+                            Batch ID
+                        </label>
 
-
-                {aiError && (
-
-                    <p>
-                        ⚠️ {aiError}
-                    </p>
-
-                )}
-
-
-                {aiResult?.bestPrediction && (
-
-                    <div>
-
-                        <p>
-
-                            <strong>
-                                Detected:
-                            </strong>{" "}
-
-                            {
-                                aiResult
-                                    .bestPrediction
-                                    .class_name
+                        <input
+                            type="text"
+                            name="batchId"
+                            value={
+                                formData.batchId
                             }
-
-                        </p>
-
-
-                        <p>
-
-                            <strong>
-                                Confidence:
-                            </strong>{" "}
-
-                            {(
-                                Number(
-                                    aiResult
-                                        .bestPrediction
-                                        .confidence
-                                ) * 100
-                            ).toFixed(2)}
-
-                            %
-
-                        </p>
-
-
-                        <p>
-
-                            <strong>
-                                Automatic Quality Grade:
-                            </strong>{" "}
-
-                            {aiResult.grade}
-
-                        </p>
-
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Enter batch ID"
+                        />
 
                     </div>
 
-                )}
+                    <div className="form-group">
 
-            </div>
+                        <label>
+                            Storage Days
+                        </label>
 
+                        <input
+                            type="number"
+                            name="storage_days"
+                            value={
+                                formData.storage_days
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            min="0"
+                            placeholder="Enter storage days"
+                        />
 
-            {/* =================================
-                PRODUCT INFORMATION
-            ================================= */}
+                    </div>
 
-            <div>
+                    <div className="form-group">
 
-                <label>
-                    Fruit Weight (g)
-                </label>
+                        <label>
+                            Fruit Weight (kg)
+                        </label>
 
-                <input
-                    type="number"
-                    name="fruitWeight"
-                    value={
-                        formData.fruitWeight
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                        <input
+                            type="number"
+                            name="fruitWeight"
+                            value={
+                                formData.fruitWeight
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.01"
+                            placeholder="Example: 1.5"
+                        />
 
-            </div>
+                    </div>
 
+                    <div className="form-group">
 
-            <div>
+                        <label>
+                            Size Grade
+                        </label>
 
-                <label>
-                    Size Grade
-                </label>
+                        <select
+                            name="sizeGrade"
+                            value={
+                                formData.sizeGrade
+                            }
+                            onChange={
+                                handleChange
+                            }
+                        >
+                            <option value="Large">
+                                Large
+                            </option>
 
-                <select
-                    name="sizeGrade"
-                    value={
-                        formData.sizeGrade
-                    }
-                    onChange={
-                        handleChange
-                    }
-                >
+                            <option value="Medium">
+                                Medium
+                            </option>
 
-                    <option value="Small">
-                        Small
-                    </option>
+                            <option value="Small">
+                                Small
+                            </option>
+                        </select>
 
-                    <option value="Medium">
-                        Medium
-                    </option>
+                    </div>
 
-                    <option value="Large">
-                        Large
-                    </option>
+                    <div className="form-group">
 
-                </select>
+                        <label>
+                            Market Price
+                        </label>
 
-            </div>
+                        <input
+                            type="number"
+                            name="marketPrice"
+                            value={
+                                formData.marketPrice
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.01"
+                            placeholder="Enter market price"
+                        />
 
+                    </div>
 
-            <div>
+                    <div className="form-group">
 
-                <label>
-                    Market Price
-                </label>
+                        <label>
+                            Aroma Score
+                        </label>
 
-                <input
-                    type="number"
-                    name="marketPrice"
-                    value={
-                        formData.marketPrice
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                        <input
+                            type="number"
+                            name="aromaScore"
+                            value={
+                                formData.aromaScore
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.1"
+                            placeholder="Enter aroma score"
+                        />
 
-            </div>
+                    </div>
 
+                    <div className="form-group">
 
-            <div>
+                        <label>
+                            Sweetness (Brix)
+                        </label>
 
-                <label>
-                    Aroma Score
-                </label>
+                        <input
+                            type="number"
+                            name="sweetnessBrix"
+                            value={
+                                formData.sweetnessBrix
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.1"
+                            placeholder="Example: 14"
+                        />
 
-                <input
-                    type="number"
-                    name="aromaScore"
-                    value={
-                        formData.aromaScore
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                    </div>
 
-            </div>
+                    <div className="form-group">
 
+                        <label>
+                            Fruit Length (cm)
+                        </label>
 
-            <div>
+                        <input
+                            type="number"
+                            name="fruitLength"
+                            value={
+                                formData.fruitLength
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.1"
+                        />
 
-                <label>
-                    Sweetness (Brix)
-                </label>
+                    </div>
 
-                <input
-                    type="number"
-                    name="sweetnessBrix"
-                    value={
-                        formData.sweetnessBrix
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                    <div className="form-group">
 
-            </div>
+                        <label>
+                            Fruit Width (cm)
+                        </label>
 
+                        <input
+                            type="number"
+                            name="fruitWidth"
+                            value={
+                                formData.fruitWidth
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.1"
+                        />
 
-            <div>
+                    </div>
 
-                <label>
-                    Fruit Length
-                </label>
+                    <div className="form-group">
 
-                <input
-                    type="number"
-                    name="fruitLength"
-                    value={
-                        formData.fruitLength
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                        <label>
+                            Fruit Height (cm)
+                        </label>
 
-            </div>
+                        <input
+                            type="number"
+                            name="fruitHeight"
+                            value={
+                                formData.fruitHeight
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            step="0.1"
+                        />
 
+                    </div>
 
-            <div>
+                    {/* ---------------------------------------
+                        PHOTO AI
+                    ---------------------------------------- */}
+                    <div className="photo-ai-section">
 
-                <label>
-                    Fruit Width
-                </label>
+                        <h2>
+                            AI Quality Detection
+                        </h2>
 
-                <input
-                    type="number"
-                    name="fruitWidth"
-                    value={
-                        formData.fruitWidth
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                        <div className="form-group">
 
-            </div>
+                            <label>
+                                Upload Pineapple Image
+                            </label>
 
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={
+                                    handleImageChange
+                                }
+                            />
 
-            <div>
+                        </div>
 
-                <label>
-                    Fruit Height
-                </label>
+                        {imagePreview && (
+                            <div className="image-preview">
 
-                <input
-                    type="number"
-                    name="fruitHeight"
-                    value={
-                        formData.fruitHeight
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    min="0"
-                />
+                                <img
+                                    src={
+                                        imagePreview
+                                    }
+                                    alt="Pineapple preview"
+                                />
 
-            </div>
+                            </div>
+                        )}
 
+                        <button
+                            type="button"
+                            onClick={
+                                handlePhotoPrediction
+                            }
+                            disabled={
+                                !selectedImage
+                            }
+                        >
+                            Analyze Image
+                        </button>
 
-            {/* =================================
-                SUBMIT
-            ================================= */}
+                        {photoPrediction && (
+                            <div className="prediction-result">
 
-            <button
-                type="submit"
-                disabled={
-                    loading ||
-                    !environment ||
-                    !aiResult?.bestPrediction
-                }
-            >
+                                <h3>
+                                    Photo AI Result
+                                </h3>
 
-                {loading
-                    ? "Saving..."
-                    : "Add Pineapple Batch"}
+                                <p>
+                                    <strong>
+                                        Prediction:
+                                    </strong>{" "}
+                                    {
+                                        photoPrediction.class ||
+                                        photoPrediction.class_name ||
+                                        photoPrediction.name ||
+                                        photoPrediction.label ||
+                                        "Unknown"
+                                    }
+                                </p>
 
-            </button>
+                                <p>
+                                    <strong>
+                                        Confidence:
+                                    </strong>{" "}
+                                    {Math.round(
+                                        Number(
+                                            photoPrediction.confidence ||
+                                                0
+                                        ) * 100
+                                    )}
+                                    %
+                                </p>
 
+                                <p>
+                                    <strong>
+                                        Quality Grade:
+                                    </strong>{" "}
+                                    {
+                                        qualityGrade
+                                    }
+                                </p>
 
-        </form>
+                            </div>
+                        )}
 
+                    </div>
 
-        {/* =====================================
-            QR MODAL
-        ===================================== */}
-
-        {qrModalVisible &&
-            generatedQR && (
-
-            <div>
-
-                <h3>
-                    QR Code Generated
-                </h3>
-
-
-                {generatedQR.qrCode && (
-
-                    <img
-                        src={
-                            generatedQR.qrCode
+                    {/* ---------------------------------------
+                        SUBMIT
+                    ---------------------------------------- */}
+                    <button
+                        type="submit"
+                        disabled={
+                            submitting
                         }
-                        alt="Generated QR Code"
-                        style={{
-                            width: "300px"
-                        }}
-                    />
+                    >
+                        {submitting
+                            ? "Saving..."
+                            : "Add Pineapple Batch"}
+                    </button>
 
-                )}
-
-
-                <button
-                    type="button"
-                    onClick={() =>
-                        setQRModalVisible(false)
-                    }
-                >
-
-                    Close
-
-                </button>
+                </form>
 
             </div>
 
-        )}
+            {/* ---------------------------------------------
+                QR MODAL
+            ---------------------------------------------- */}
+            {qrModalVisible &&
+                generatedQR && (
+                    <div className="qr-modal-overlay">
 
-    </div>
+                        <div className="qr-modal">
 
-);
+                            <button
+                                className="qr-close-button"
+                                onClick={closeQRModal }
+                            >
+                                ×
+                            </button>
 
+                            <h2>
+                                Pineapple QR Code
+                            </h2>
+
+                            <p>
+                                Batch saved
+                                successfully.
+                            </p>
+
+                           {generatedQR.qrCodeImage && (
+                             <img
+                                src={generatedQR.qrCodeImage}
+                                alt="Generated QR Code"
+                                className="generated-qr"
+                               />
+                            )}
+
+                            <div className="qr-details">
+
+                             <p>
+                                    <strong>Batch ID:</strong>{" "}
+                                    {generatedQR.batchId || generatedBatchId}
+                                </p>
+
+                             <p>
+                                     <strong>QR ID:</strong>{" "}
+                                     {generatedQR.qrId}
+                                  </p>
+
+
+                               <p>
+                                    <strong>Warehouse:</strong>{" "}
+                                    {generatedQR.warehouseId}
+                                </p>
+
+                                <p>
+                                    QR code generated successfully.
+                                </p>
+
+                            </div>
+
+                            <button
+                                onClick={
+                                    closeQRModal
+                                }
+                            >
+                                Close
+                            </button>
+
+                        </div>
+
+                    </div>
+                )}
+
+        </div>
+    );
 }
 
 export default AddPineapple;
