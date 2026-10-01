@@ -4,6 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const pineappleRoutes = require("./routes/pineappleRoutes");
+const gpsRoutes = require("./routes/GPSData");
+const sensorRoutes = require("./routes/SensorData");
 
 const app = express();
 
@@ -12,11 +14,13 @@ const app = express();
 // ================================
 app.use(cors());
 app.use(express.json());
+app.use("/api/sensor", sensorRoutes);
 
 // ================================
 // Routes
 // ================================
 app.use("/api/pineapple", pineappleRoutes);
+app.use("/api/gps", gpsRoutes);
 
 app.get("/test", (req, res) => {
     res.send("test works");
