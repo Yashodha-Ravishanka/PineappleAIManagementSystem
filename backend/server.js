@@ -6,6 +6,8 @@ require("dotenv").config();
 const pineappleRoutes = require("./routes/pineappleRoutes");
 const gpsRoutes = require("./routes/GPSData");
 const sensorRoutes = require("./routes/SensorData");
+const qrRoutes = require("./routes/PineappleQR");
+const trackingRoutes = require("./routes/Tracking");
 
 const app = express();
 
@@ -15,6 +17,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/sensor", sensorRoutes);
+app.use("/api/qr", qrRoutes);
+app.use("/api/pineapple", pineappleRoutes);
+app.use("/api/gps", gpsRoutes);
+app.use("/api/sensor", sensorRoutes);
+app.use("/api/qr", qrRoutes);
+app.use("/api/tracking", trackingRoutes);
 
 // ================================
 // Routes
