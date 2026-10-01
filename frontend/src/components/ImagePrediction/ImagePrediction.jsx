@@ -1,7 +1,9 @@
 import { useState } from "react";
 import "./ImagePrediction.css";
 
-const YOLO_API_URL = "http://localhost:5000/predict";
+const YOLO_API_URL =
+    import.meta.env.VITE_PHOTO_AI_URL ||
+    "http://localhost:5000/predict";
 
 function ImagePrediction() {
     const [selectedImage, setSelectedImage] = useState(null);

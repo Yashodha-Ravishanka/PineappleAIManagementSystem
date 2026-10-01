@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 import VehicleEnvironment from "../components/VehicleEnvironment";
@@ -16,6 +17,11 @@ import GPSTracker from "../components/GPSTracker";
 import { getAllPineapples } from "../services/api";
 
 import "./Dashboard.css";
+
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000/api/pineapple";
 
 
 function Dashboard() {
@@ -96,7 +102,7 @@ function Dashboard() {
 
       const environmentResponse =
         await fetch(
-          "http://localhost:3000/api/pineapple/environment/latest?warehouseId=WH-001"
+          `${API_URL}/environment/latest?warehouseId=WH-001`
         );
 
 
@@ -387,7 +393,6 @@ function Dashboard() {
   // ENVIRONMENT STATUS
   // ===============================
 
-  // Use LIVE ESP32 values
   const currentTemperature =
     liveTemperature;
 

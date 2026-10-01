@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./AddPineapple.css";
 
-const API_URL = "http://localhost:3000/api/pineapple";
-const PHOTO_AI_URL = "http://127.0.0.1:5000/predict";
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:3000/api/pineapple";
+const PHOTO_AI_URL =
+    import.meta.env.VITE_PHOTO_AI_URL ||
+    "https://size-weight-afternoon-outlet.trycloudflare.com/predict";
 const QR_API_URL =
     "https://pineapple-ai-backend.de.deplexo.com/api/qr/generate";
 
