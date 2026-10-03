@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import "./AIPrediction.css";
 
@@ -5,31 +6,62 @@ import { getAllPineapples } from "../services/api";
 
 function AIPrediction() {
     const [latest, setLatest] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         loadLatest();
+
+        // Refresh AI result every 5 seconds
+        const interval = setInterval(() => {
+            loadLatest();
+        }, 5000);
+
+        return () => {
+            clearInterval(interval);
+        };
     }, []);
+
+    // ==========================================
+    // LOAD LATEST PINEAPPLE DATA
+    // ==========================================
 
     async function loadLatest() {
         try {
+            setError("");
+
             const data = await getAllPineapples();
 
-            if (data && data.length > 0) {
-                const latestReading = data.reduce(
-                    (latestItem, currentItem) => {
-                        return new Date(currentItem.timestamp) >
-                            new Date(latestItem.timestamp)
-                            ? currentItem
-                            : latestItem;
-                    }
-                );
-
-                setLatest(latestReading);
+            if (!Array.isArray(data) || data.length === 0) {
+                setLatest(null);
+                return;
             }
+
+            // Find newest reading
+            const latestReading = data.reduce(
+                (latestItem, currentItem) => {
+                    return new Date(currentItem.timestamp) >
+                        new Date(latestItem.timestamp)
+                        ? currentItem
+                        : latestItem;
+                }
+            );
+
+            setLatest(latestReading);
         } catch (error) {
-            console.log("AI prediction error:", error);
+            console.error("AI prediction error:", error);
+
+            setError(
+                "Unable to load the latest AI prediction."
+            );
+        } finally {
+            setLoading(false);
         }
     }
+
+    // ==========================================
+    // QUALITY CSS CLASS
+    // ==========================================
 
     function getQualityClass(quality) {
         switch (quality?.toLowerCase()) {
@@ -47,6 +79,10 @@ function AIPrediction() {
         }
     }
 
+    // ==========================================
+    // RISK CSS CLASS
+    // ==========================================
+
     function getRiskClass(risk) {
         switch (risk?.toLowerCase()) {
             case "low":
@@ -63,12 +99,60 @@ function AIPrediction() {
         }
     }
 
+    // ==========================================
+    // LOADING
+    // ==========================================
+
+    if (loading) {
+        return (
+            <div className="ai-prediction">
+
+                <div className="ai-header">
+
+                    <div className="ai-header-icon">
+                        🤖
+                    </div>
+
+                    <div>
+                        <h2>
+                            Latest AI Quality Prediction
+                        </h2>
+
+                        <p>
+                            AI-based pineapple quality and
+                            storage risk assessment
+                        </p>
+                    </div>
+
+                </div>
+
+                <div className="ai-empty">
+
+                    <span>
+                        🤖
+                    </span>
+
+                    <strong>
+                        Loading AI prediction...
+                    </strong>
+
+                    <p>
+                        Retrieving the latest pineapple
+                        monitoring data.
+                    </p>
+
+                </div>
+
+            </div>
+        );
+    }
+
     return (
         <div className="ai-prediction">
 
-            {/* ===============================
+            {/* ==========================================
                 HEADER
-                =============================== */}
+            ========================================== */}
 
             <div className="ai-header">
 
@@ -91,13 +175,29 @@ function AIPrediction() {
 
             </div>
 
-            {/* ===============================
+
+            {/* ==========================================
+                ERROR
+            ========================================== */}
+
+            {error && (
+                <div className="ai-error">
+                    ⚠️ {error}
+                </div>
+            )}
+
+
+            {/* ==========================================
                 PREDICTION
-                =============================== */}
+            ========================================== */}
 
             {latest ? (
 
                 <div className="prediction-result">
+
+                    {/* ==================================
+                        BATCH
+                    ================================== */}
 
                     <div className="prediction-batch">
 
@@ -108,7 +208,7 @@ function AIPrediction() {
                             </span>
 
                             <strong>
-                                🍍 {latest.batchId}
+                                🍍 {latest.batchId || "Unknown Batch"}
                             </strong>
 
                         </div>
@@ -120,11 +220,13 @@ function AIPrediction() {
                     </div>
 
 
-                    {/* ===============================
+                    {/* ==================================
                         SENSOR DATA
-                        =============================== */}
+                    ================================== */}
 
                     <div className="prediction-grid">
+
+                        {/* Temperature */}
 
                         <div className="prediction-card">
 
@@ -147,6 +249,8 @@ function AIPrediction() {
                         </div>
 
 
+                        {/* Humidity */}
+
                         <div className="prediction-card">
 
                             <span className="prediction-icon">
@@ -168,6 +272,8 @@ function AIPrediction() {
                         </div>
 
 
+                        {/* Storage Days */}
+
                         <div className="prediction-card">
 
                             <span className="prediction-icon">
@@ -188,6 +294,8 @@ function AIPrediction() {
 
                         </div>
 
+
+                        {/* MQ135 */}
 
                         <div className="prediction-card">
 
@@ -212,11 +320,13 @@ function AIPrediction() {
                     </div>
 
 
-                    {/* ===============================
+                    {/* ==================================
                         AI RESULT
-                        =============================== */}
+                    ================================== */}
 
                     <div className="ai-result-section">
+
+                        {/* Quality */}
 
                         <div className="ai-result-card">
 
@@ -235,10 +345,12 @@ function AIPrediction() {
                         </div>
 
 
+                        {/* Risk */}
+
                         <div className="ai-result-card">
 
                             <span className="result-label">
-                                ⚠ Risk Level
+                                ⚠️ Risk Level
                             </span>
 
                             <span
@@ -254,9 +366,79 @@ function AIPrediction() {
                     </div>
 
 
-                    {/* ===============================
+                    {/* ==================================
+                        QUALITY GRADE
+                    ================================== */}
+
+                    {latest.qualityGrade && (
+
+                        <div className="ai-result-card">
+
+                            <span className="result-label">
+                                🏆 Quality Grade
+                            </span>
+
+                            <strong>
+                                {latest.qualityGrade}
+                            </strong>
+
+                        </div>
+
+                    )}
+
+
+                    {/* ==================================
+                        AI CONFIDENCE
+                    ================================== */}
+
+                    {latest.confidence !== undefined &&
+                        latest.confidence !== null && (
+
+                            <div className="ai-confidence">
+
+                                <div className="confidence-header">
+
+                                    <span>
+                                        🤖 AI Confidence
+                                    </span>
+
+                                    <strong>
+                                        {Math.round(
+                                            Number(
+                                                latest.confidence
+                                            ) * 100
+                                        )}%
+                                    </strong>
+
+                                </div>
+
+                                <div className="confidence-bar">
+
+                                    <div
+                                        className="confidence-fill"
+                                        style={{
+                                            width: `${Math.min(
+                                                100,
+                                                Math.max(
+                                                    0,
+                                                    Number(
+                                                        latest.confidence
+                                                    ) * 100
+                                                )
+                                            )}%`,
+                                        }}
+                                    />
+
+                                </div>
+
+                            </div>
+
+                        )}
+
+
+                    {/* ==================================
                         RECOMMENDATION
-                        =============================== */}
+                    ================================== */}
 
                     <div className="ai-recommendation">
 
@@ -272,9 +454,9 @@ function AIPrediction() {
                     </div>
 
 
-                    {/* ===============================
+                    {/* ==================================
                         TIMESTAMP
-                        =============================== */}
+                    ================================== */}
 
                     <div className="ai-last-update">
 
@@ -291,6 +473,10 @@ function AIPrediction() {
                 </div>
 
             ) : (
+
+                /* ======================================
+                   NO DATA
+                ====================================== */
 
                 <div className="ai-empty">
 

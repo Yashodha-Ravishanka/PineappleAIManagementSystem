@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import "./AIPricePrediction.css";
 
 const QR_API_URL =
-    "https://pineapple-ai-backend.de.deplexo.com/api/qr";
-
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:3000/api/qr";
+    
 const ML_API_URL =
     import.meta.env.VITE_ML_API_URL ||
     "http://localhost:5002";

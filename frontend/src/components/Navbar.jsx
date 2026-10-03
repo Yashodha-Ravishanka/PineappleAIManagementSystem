@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
@@ -26,6 +25,18 @@ function Navbar() {
 
         <NavLink to="/add">
           Add Data
+        </NavLink>
+
+        <NavLink to="/qr-price">
+          💰 QR & AI Price
+        </NavLink>
+
+        <NavLink to="/grading">
+          🍍 Pineapple Grading
+        </NavLink>
+
+        <NavLink to="/freshness">
+          🧪 Freshness Detection
         </NavLink>
 
       </div>
