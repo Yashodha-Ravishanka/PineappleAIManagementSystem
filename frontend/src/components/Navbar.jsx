@@ -27,16 +27,16 @@ function Navbar() {
           Add Data
         </NavLink>
 
-        <NavLink to="/qr-price">
-          💰 QR & AI Price
+         <NavLink to="/freshness">
+          🧪 Freshness Detection
         </NavLink>
 
         <NavLink to="/grading">
           🍍 Pineapple Grading
         </NavLink>
 
-        <NavLink to="/freshness">
-          🧪 Freshness Detection
+        <NavLink to="/qr-price">
+          💰 QR & AI Price
         </NavLink>
 
       </div>
